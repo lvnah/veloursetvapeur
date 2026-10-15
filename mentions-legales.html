@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentions Légales | Velours & Vapeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            plum: '#4a1531',
+                            plumDark: '#2d0c1d',
+                            plumLight: '#73234d',
+                            cream: '#fcfaf8',
+                            beige: '#f0e8df',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(74, 21, 49, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body
+    class="bg-brand-cream text-brand-plum font-sans antialiased flex flex-col min-h-screen selection:bg-brand-plum selection:text-brand-cream tracking-tight">
+
+    <header
+        class="sticky top-0 z-50 bg-brand-cream/95 backdrop-blur-md border-b border-brand-plum/10 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center group">
+                <img src="images/logo.png" alt="Logo Velours & Vapeur" class="h-7 sm:h-9 w-auto object-contain">
+            </a>
+            <a href="index.html"
+                class="text-xs font-bold text-brand-plum/70 hover:text-brand-plum transition-colors flex items-center gap-1.5 bg-white shadow-sm px-4 py-2 rounded-full border border-brand-plum/10">
+                <i data-lucide="chevron-left" class="w-4 h-4 text-brand-plum"></i>
+                <span>Retour au site</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow py-10 sm:py-20 px-4 sm:px-6 max-w-4xl mx-auto w-full">
+        <div
+            class="bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-12 shadow-soft space-y-6 sm:space-y-8 border border-brand-plum/5">
+
+            <div class="space-y-2">
+                <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-plumLight">Informations Réglementaires
+                </p>
+                <h1 class="text-2xl sm:text-4xl md:text-5xl font-black text-brand-plum">
+                    Mentions Légales
+                </h1>
+            </div>
+
+            <div class="h-px w-full bg-brand-plum/10"></div>
+
+            <div class="space-y-6 sm:space-y-8 text-xs sm:text-sm text-brand-plum/80 leading-relaxed font-medium">
+                <section class="space-y-2.5">
+                    <h2 class="text-base sm:text-lg font-bold text-brand-plum flex items-center gap-2">
+                        <i data-lucide="building" class="w-4 h-4 text-brand-plumLight shrink-0"></i>
+                        <span>1. Éditeur du site</span>
+                    </h2>
+                    <p>Le présent site web est édité et exploité par l'entreprise individuelle <strong
+                            class="text-brand-plum">VELOURS ET VAPEUR</strong> :</p>
+                    <ul class="list-disc pl-5 space-y-1 text-brand-plum">
+                        <li><strong>Entrepreneur individuel :</strong> Guillaume CHARPEIL</li>
+                        <li><strong>Siège social :</strong> Perpignan (66000), Pyrénées-Orientales, France</li>
+                        <li><strong>N° SIREN :</strong> 938 963 474</li>
+                        <li><strong>N° SIRET :</strong> 938 963 474 00015</li>
+                        <li><strong>N° TVA Intracommunautaire :</strong> FR15938963474</li>
+                        <li><strong>Téléphone :</strong> 06 95 79 57 91</li>
+                        <li><strong>Adresse e-mail :</strong> veloursetvapeur@gmail.com</li>
+                        <li><strong>Directeur de la publication :</strong> Guillaume CHARPEIL</li>
+                    </ul>
+                </section>
+
+                <section class="space-y-2.5">
+                    <h2 class="text-base sm:text-lg font-bold text-brand-plum flex items-center gap-2">
+                        <i data-lucide="server" class="w-4 h-4 text-brand-plumLight shrink-0"></i>
+                        <span>2. Hébergement du site</span>
+                    </h2>
+                    <p>Le site est hébergé par la société <strong class="text-brand-plum">Netlify, Inc.</strong> :</p>
+                    <ul class="list-disc pl-5 space-y-1 text-brand-plum">
+                        <li><strong>Adresse :</strong> 512 2nd Street, Suite 200, San Francisco, CA 94107, États-Unis
+                        </li>
+                        <li><strong>Site Web :</strong> <a href="https://www.netlify.com" target="_blank"
+                                class="text-brand-plumLight hover:underline font-bold">www.netlify.com</a></li>
+                    </ul>
+                </section>
+
+                <section class="space-y-2.5">
+                    <h2 class="text-base sm:text-lg font-bold text-brand-plum flex items-center gap-2">
+                        <i data-lucide="shield" class="w-4 h-4 text-brand-plumLight shrink-0"></i>
+                        <span>3. Propriété intellectuelle</span>
+                    </h2>
+                    <p>L'ensemble des éléments figurant sur le site <strong class="text-brand-plum">Velours &
+                            Vapeur</strong> (textes, graphismes, logos, photographies, illustrations) est la propriété
+                        exclusive de l'entreprise VELOURS ET VAPEUR.</p>
+                    <p>Toute reproduction ou représentation totale ou partielle est interdite sans l'autorisation écrite
+                        préalable de Guillaume CHARPEIL.</p>
+                </section>
+
+                <section class="space-y-2.5">
+                    <h2 class="text-base sm:text-lg font-bold text-brand-plum flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4 text-brand-plumLight shrink-0"></i>
+                        <span>4. Limitation de responsabilité</span>
+                    </h2>
+                    <p>VELOURS ET VAPEUR s'efforce de fournir des informations aussi précises que possible, mais ne
+                        pourra être tenue responsable des omissions ou inexactitudes dans la mise à jour.</p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-brand-plumDark py-6 text-center text-xs text-brand-cream/60">
+        <p>© 2026 VELOURS ET VAPEUR - Tous droits réservés</p>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>
