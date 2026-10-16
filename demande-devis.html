@@ -8,9 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <script>
@@ -36,17 +34,14 @@
     </script>
 </head>
 
-<body
-    class="bg-brand-cream text-brand-plum font-sans antialiased flex flex-col min-h-screen selection:bg-brand-plum selection:text-brand-cream tracking-tight">
+<body class="bg-brand-cream text-brand-plum font-sans antialiased flex flex-col min-h-screen selection:bg-brand-plum selection:text-brand-cream tracking-tight">
 
-    <header
-        class="sticky top-0 z-50 bg-brand-cream/95 backdrop-blur-md border-b border-brand-plum/10 transition-all duration-300">
+    <header class="sticky top-0 z-50 bg-brand-plum/95 backdrop-blur-md border-b border-white/10 transition-all duration-300 text-brand-cream">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="flex items-center group">
                 <img src="images/logo.png" alt="Logo Velours & Vapeur" class="h-7 sm:h-9 w-auto object-contain">
             </a>
-            <a href="index.html"
-                class="text-xs font-bold text-brand-plum/70 hover:text-brand-plum transition-colors flex items-center gap-1.5 bg-white shadow-sm px-4 py-2 rounded-full border border-brand-plum/10">
+            <a href="index.html" class="text-xs font-bold text-brand-plum hover:bg-brand-beige transition-colors flex items-center gap-1.5 bg-brand-cream shadow-sm px-4 py-2 rounded-full">
                 <i data-lucide="chevron-left" class="w-4 h-4 text-brand-plum"></i>
                 <span>Retour au site</span>
             </a>
@@ -54,8 +49,7 @@
     </header>
 
     <main class="flex-grow py-8 sm:py-16 px-4 sm:px-6 max-w-2xl mx-auto w-full relative">
-        <div
-            class="bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-soft space-y-6 relative z-10 border border-brand-plum/5">
+        <div class="bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-soft space-y-6 relative z-10 border border-brand-plum/5">
 
             <div class="text-center space-y-2">
                 <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-plumLight">Estimation en ligne</p>
@@ -69,8 +63,7 @@
 
             <div class="h-px w-full bg-brand-plum/10"></div>
 
-            <form id="form-devis" action="https://formsubmit.co/theoreal66200@gmail.com" method="POST"
-                enctype="multipart/form-data" class="space-y-5">
+            <form id="form-devis" action="https://formsubmit.co/theoreal66200@gmail.com" method="POST" enctype="multipart/form-data" class="space-y-5">
                 <input type="hidden" name="_subject" value="✨ Nouvelle demande de devis - Velours & Vapeur">
                 <input type="hidden" name="_template" value="box">
                 <input type="hidden" name="_next" value="https://veloursetvapeur.netlify.app/merci.html">
@@ -79,20 +72,15 @@
 
                 <!-- Type de client -->
                 <div class="space-y-2">
-                    <label class="block text-xs font-bold text-brand-plum/70 uppercase tracking-wider">Vous êtes
-                        :</label>
+                    <label class="block text-xs font-bold text-brand-plum/70 uppercase tracking-wider">Vous êtes :</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <label
-                            class="flex items-center justify-center gap-2 p-3 border rounded-xl sm:rounded-2xl cursor-pointer bg-brand-cream border-brand-plum/10 hover:border-brand-plum/40 font-bold text-xs transition-all text-brand-plum">
-                            <input type="radio" name="Type_De_Client" value="Particulier" checked
-                                class="accent-brand-plum w-4 h-4">
+                        <label class="flex items-center justify-center gap-2 p-3 border rounded-xl sm:rounded-2xl cursor-pointer bg-brand-cream border-brand-plum/10 hover:border-brand-plum/40 font-bold text-xs transition-all text-brand-plum">
+                            <input type="radio" name="Type_De_Client" value="Particulier" checked class="accent-brand-plum w-4 h-4">
                             <i data-lucide="user" class="w-4 h-4 text-brand-plumLight"></i>
                             <span>Particulier</span>
                         </label>
-                        <label
-                            class="flex items-center justify-center gap-2 p-3 border rounded-xl sm:rounded-2xl cursor-pointer bg-brand-cream border-brand-plum/10 hover:border-brand-plum/40 font-bold text-xs transition-all text-brand-plum">
-                            <input type="radio" name="Type_De_Client" value="Professionnel"
-                                class="accent-brand-plum w-4 h-4">
+                        <label class="flex items-center justify-center gap-2 p-3 border rounded-xl sm:rounded-2xl cursor-pointer bg-brand-cream border-brand-plum/10 hover:border-brand-plum/40 font-bold text-xs transition-all text-brand-plum">
+                            <input type="radio" name="Type_De_Client" value="Professionnel" class="accent-brand-plum w-4 h-4">
                             <i data-lucide="building-2" class="w-4 h-4 text-brand-plumLight"></i>
                             <span>Professionnel</span>
                         </label>
@@ -102,41 +90,31 @@
                 <!-- Nom et Ville -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
-                        <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Nom &
-                            Prénom / Entreprise</label>
-                        <input type="text" name="Nom_Et_Prenom" id="name" required
-                            class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
+                        <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Nom & Prénom / Entreprise</label>
+                        <input type="text" name="Nom_Et_Prenom" id="name" required class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Ville de
-                            l'intervention</label>
-                        <input type="text" name="Ville_Intervention" id="ville" placeholder="Ex: Perpignan" required
-                            class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
+                        <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Ville de l'intervention</label>
+                        <input type="text" name="Ville_Intervention" id="ville" placeholder="Ex: Perpignan" required class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
                     </div>
                 </div>
 
                 <!-- Email et Téléphone -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
-                        <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Adresse
-                            Email</label>
-                        <input type="email" name="Email_Client" id="email" required
-                            class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
+                        <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Adresse Email</label>
+                        <input type="email" name="Email_Client" id="email" required class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
                     </div>
                     <div class="space-y-1.5">
-                        <label
-                            class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Téléphone</label>
-                        <input type="tel" name="Telephone_Contact" id="phone" required
-                            class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
+                        <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Téléphone</label>
+                        <input type="tel" name="Telephone_Contact" id="phone" required class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow">
                     </div>
                 </div>
 
                 <!-- Prestation -->
                 <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Prestation
-                        souhaitée</label>
-                    <select name="Prestation_Demande" id="prestation" required
-                        class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-medium focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow text-brand-plum">
+                    <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Prestation souhaitée</label>
+                    <select name="Prestation_Demande" id="prestation" required class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-medium focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow text-brand-plum">
                         <option value="" disabled selected>Sélectionnez une option...</option>
                         <option value="Canapé / Fauteuil / Chaises">Canapé / Fauteuil / Chaises</option>
                         <option value="Matelas / Literie">Matelas / Literie</option>
@@ -148,28 +126,22 @@
 
                 <!-- Message -->
                 <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Détails
-                        (dimensions, état, taches...)</label>
-                    <textarea name="Details_De_La_Demande" id="message" rows="3"
-                        placeholder="Ex: Canapé d'angle 4 places en tissu beige..." required
-                        class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow"></textarea>
+                    <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider">Détails (dimensions, état, taches...)</label>
+                    <textarea name="Details_De_La_Demande" id="message" rows="3" placeholder="Ex: Canapé d'angle 4 places en tissu beige..." required class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow"></textarea>
                 </div>
 
                 <!-- Photos -->
                 <div class="space-y-1.5">
-                    <label
-                        class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider flex items-center gap-1.5">
+                    <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider flex items-center gap-1.5">
                         <i data-lucide="camera" class="w-4 h-4 text-brand-plumLight"></i>
                         <span>Photos (Optionnel - Max 3)</span>
                     </label>
-                    <input type="file" name="attachment" id="photos" accept="image/*" multiple
-                        class="w-full p-2.5 bg-brand-cream border border-brand-plum/10 rounded-xl text-xs text-brand-plum font-medium file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-plum file:text-brand-cream cursor-pointer hover:file:bg-brand-plumLight transition-colors">
+                    <input type="file" name="attachment" id="photos" accept="image/*" multiple class="w-full p-2.5 bg-brand-cream border border-brand-plum/10 rounded-xl text-xs text-brand-plum font-medium file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-plum file:text-brand-cream cursor-pointer hover:file:bg-brand-plumLight transition-colors">
                 </div>
 
                 <!-- Bouton -->
                 <div class="pt-4">
-                    <button type="submit" id="btn-submit"
-                        class="w-full bg-brand-plum text-brand-cream py-4 rounded-full font-bold shadow-md hover:bg-brand-plumLight transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                    <button type="submit" id="btn-submit" class="w-full bg-brand-plum text-brand-cream py-4 rounded-full font-bold shadow-md hover:bg-brand-plumLight transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2">
                         <span>Envoyer ma demande</span>
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
