@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,13 +129,15 @@
                     <textarea name="Details_De_La_Demande" id="message" rows="3" placeholder="Ex: Canapé d'angle 4 places en tissu beige..." required class="w-full p-3.5 bg-brand-cream border border-brand-plum/10 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-brand-plum font-medium placeholder-brand-plum/30 focus:outline-none focus:border-brand-plum focus:ring-1 focus:ring-brand-plum transition-shadow"></textarea>
                 </div>
 
-                <!-- Photos -->
+                <!-- Photos (obligatoire) -->
                 <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider flex items-center gap-1.5">
+                    <label for="photos" class="block text-[11px] font-bold text-brand-plum/70 uppercase tracking-wider flex items-center gap-1.5">
                         <i data-lucide="camera" class="w-4 h-4 text-brand-plumLight"></i>
-                        <span>Photos (Optionnel - Max 3)</span>
+                        <span>Photos <span class="text-brand-plumLight">*</span> (Obligatoire - 1 à 3 photos)</span>
                     </label>
-                    <input type="file" name="attachment" id="photos" accept="image/*" multiple class="w-full p-2.5 bg-brand-cream border border-brand-plum/10 rounded-xl text-xs text-brand-plum font-medium file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-plum file:text-brand-cream cursor-pointer hover:file:bg-brand-plumLight transition-colors">
+                    <input type="file" name="attachment" id="photos" accept="image/*" multiple required class="w-full p-2.5 bg-brand-cream border border-brand-plum/10 rounded-xl text-xs text-brand-plum font-medium file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-plum file:text-brand-cream cursor-pointer hover:file:bg-brand-plumLight transition-colors">
+                    <p class="text-[11px] text-brand-plum/60 font-medium">Au moins une photo est nécessaire pour établir votre devis.</p>
+                    <p id="photos-error" class="hidden text-[11px] font-bold text-red-700"></p>
                 </div>
 
                 <!-- Bouton -->
@@ -159,14 +160,31 @@
         document.getElementById('form-devis').addEventListener('submit', function (e) {
             const fileInput = document.getElementById('photos');
             const btnSubmit = document.getElementById('btn-submit');
-            if (fileInput.files.length > 0) {
-                let totalSize = Array.from(fileInput.files).reduce((acc, file) => acc + file.size, 0);
-                if (totalSize > 10 * 1024 * 1024) {
-                    e.preventDefault();
-                    alert("⚠️ Vos photos dépassent 10 Mo au total.");
-                    fileInput.value = "";
-                    return false;
-                }
+            const errorBox = document.getElementById('photos-error');
+            errorBox.classList.add('hidden');
+
+            const count = fileInput.files.length;
+            if (count === 0) {
+                e.preventDefault();
+                errorBox.textContent = "Veuillez ajouter au moins une photo pour envoyer votre demande.";
+                errorBox.classList.remove('hidden');
+                fileInput.focus();
+                return false;
+            }
+            if (count > 3) {
+                e.preventDefault();
+                errorBox.textContent = "Vous pouvez envoyer 3 photos maximum.";
+                errorBox.classList.remove('hidden');
+                fileInput.value = "";
+                return false;
+            }
+            const totalSize = Array.from(fileInput.files).reduce((acc, file) => acc + file.size, 0);
+            if (totalSize > 10 * 1024 * 1024) {
+                e.preventDefault();
+                errorBox.textContent = "Vos photos dépassent 10 Mo au total.";
+                errorBox.classList.remove('hidden');
+                fileInput.value = "";
+                return false;
             }
             btnSubmit.innerHTML = "⏳ Envoi en cours...";
             btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
