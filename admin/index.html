@@ -125,6 +125,7 @@
                 </div>
                 <nav class="hidden md:flex items-center gap-1" aria-label="Navigation">
                     <button class="tab-btn" data-tab="dashboard">Tableau de bord</button>
+                    <button class="tab-btn" data-tab="leads">Demandes <span class="leads-badge hidden ml-1 inline-block min-w-[18px] px-1 rounded-full bg-amber-400 text-brand-plumDark text-[10px] font-black leading-[18px] text-center">0</span></button>
                     <button class="tab-btn" data-tab="clients">Clients</button>
                     <button class="tab-btn" data-tab="documents">Devis &amp; factures</button>
                     <button class="tab-btn" data-tab="editor">Nouveau</button>
@@ -134,7 +135,7 @@
             </div>
         </header>
 
-        <main class="page-pad max-w-[1400px] mx-auto p-4 sm:p-6">
+        <main class="max-w-[1400px] mx-auto p-4 sm:p-6 pb-36 md:pb-6">
 
             <!-- TABLEAU DE BORD -->
             <section id="tab-dashboard" class="space-y-6 fade-in">
@@ -146,11 +147,12 @@
                     <div class="card p-4 sm:p-5 border-l-4 border-l-emerald-600"><p class="label">Encaissé</p><p id="k-paid" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures payées</p></div>
                     <div class="card p-4 sm:p-5 border-l-4 border-l-amber-500"><p class="label">En attente</p><p id="k-pending" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures non payées</p></div>
                     <div class="card p-4 sm:p-5 border-l-4 border-l-sky-600"><p class="label">Devis en cours</p><p id="k-quotes" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Brouillons et envoyés</p></div>
-                    <div class="card p-4 sm:p-5 border-l-4 border-l-brand-plum"><p class="label">Clients</p><p id="k-clients" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Enregistrés</p></div>
+                    <button data-tab-go="leads" class="card p-4 sm:p-5 border-l-4 border-l-brand-plum text-left"><p class="label">Nouvelles demandes</p><p id="k-leads" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">À traiter, reçues du site</p></button>
                 </div>
                 <div class="flex gap-2">
                     <button class="btn btn-primary flex-1 sm:flex-none" data-goto-new>+ Nouveau devis</button>
                     <button class="btn btn-ghost flex-1 sm:flex-none" data-tab-go="documents">Tous les documents</button>
+                    <button class="btn btn-ghost flex-1 sm:flex-none" data-tab-go="clients">Clients</button>
                 </div>
                 <div>
                     <h3 class="text-xs font-black uppercase tracking-wider opacity-70 mb-3">Derniers documents</h3>
@@ -192,6 +194,75 @@
                 </div>
                 <p id="docs-count" class="text-xs font-bold opacity-60"></p>
                 <div id="docs-list" class="space-y-3"></div>
+            </section>
+
+            <!-- DEMANDES DE DEVIS (reçues depuis le site) -->
+            <section id="tab-leads" class="hidden space-y-4 fade-in">
+                <div id="leads-list-view" class="space-y-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black">Demandes de devis</h2>
+                        <p class="text-sm opacity-65">Reçues depuis le formulaire du site.</p>
+                    </div>
+                    <div class="no-scrollbar flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0" id="lead-chips">
+                        <button class="chip active" data-lead-filter="">Toutes</button>
+                        <button class="chip" data-lead-filter="nouveau">Nouvelles</button>
+                        <button class="chip" data-lead-filter="en_cours">En cours</button>
+                        <button class="chip" data-lead-filter="devis_cree">Devis créé</button>
+                        <button class="chip" data-lead-filter="traite">Traitées</button>
+                        <button class="chip" data-lead-filter="annule">Annulées</button>
+                    </div>
+                    <div id="leads-list" class="space-y-3"></div>
+                </div>
+
+                <div id="lead-detail-view" class="hidden space-y-4">
+                    <button id="lead-back" class="btn btn-ghost !min-h-[38px] !text-xs">← Retour aux demandes</button>
+                    <div class="card p-5 sm:p-6 space-y-5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <p id="ld-date" class="text-[11px] font-black uppercase tracking-wider opacity-55"></p>
+                                <h2 id="ld-name" class="text-xl font-black truncate"></h2>
+                                <p id="ld-type" class="text-sm opacity-65"></p>
+                            </div>
+                            <span id="ld-status" class="status-pill"></span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            <div><p class="label">Email</p><a id="ld-email" class="font-bold break-all underline" href="#"></a></div>
+                            <div><p class="label">Téléphone</p><a id="ld-phone" class="font-bold underline" href="#"></a></div>
+                            <div><p class="label">Adresse</p><p id="ld-address" class="font-medium"></p></div>
+                            <div><p class="label">Ville</p><p id="ld-ville" class="font-medium"></p></div>
+                        </div>
+
+                        <div class="rounded-xl bg-brand-cream p-4 space-y-2">
+                            <p class="label">Prestation demandée</p>
+                            <p id="ld-prestation" class="font-black"></p>
+                            <p class="label pt-2">Détails</p>
+                            <p id="ld-details" class="whitespace-pre-line text-sm leading-relaxed"></p>
+                        </div>
+
+                        <div>
+                            <p class="label">Photos</p>
+                            <div id="ld-photos" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-brand-plum/10">
+                            <div>
+                                <label class="label" for="ld-status-select">Statut</label>
+                                <select id="ld-status-select">
+                                    <option value="nouveau">Nouvelle</option>
+                                    <option value="en_cours">En cours</option>
+                                    <option value="devis_cree">Devis créé</option>
+                                    <option value="traite">Traitée</option>
+                                    <option value="annule">Annulée</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button id="ld-make-devis" class="btn btn-primary w-full">Créer le devis</button>
+                            </div>
+                        </div>
+                        <p id="ld-linked" class="hidden text-sm font-bold"></p>
+                    </div>
+                </div>
             </section>
 
             <!-- ÉDITEUR -->
@@ -305,7 +376,7 @@
                     <button type="submit" class="btn btn-primary w-full sm:w-auto">Enregistrer</button>
                 </form>
                 <button id="btn-logout-2" class="btn btn-ghost w-full mt-4 btn-danger">Se déconnecter</button>
-                <p class="text-center text-[11px] opacity-50 mt-4">Version de l'administration : 13/11/2026 · 11h00</p>
+                <p class="text-center text-[11px] opacity-50 mt-4">Version de l'administration : 13/11/2026 · 12h30 (demandes du site)</p>
             </section>
         </main>
 
@@ -313,14 +384,14 @@
         <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-brand-plum/10 shadow-[0_-10px_30px_-14px_rgba(74,21,49,.35)] pb-[env(safe-area-inset-bottom)]" aria-label="Navigation mobile">
             <div class="flex items-end justify-around px-2">
                 <button class="nav-item" data-tab="dashboard"><span class="nav-ico" data-ico="home"></span>Accueil</button>
-                <button class="nav-item" data-tab="clients"><span class="nav-ico" data-ico="users"></span>Clients</button>
+                <button class="nav-item relative" data-tab="leads"><span class="nav-ico" data-ico="inbox"></span><span class="leads-badge hidden absolute top-1 left-1/2 ml-2.5 min-w-[18px] px-1 rounded-full bg-amber-400 text-brand-plumDark text-[10px] font-black leading-[18px] text-center">0</span>Demandes</button>
                 <button class="nav-item" data-tab="editor" data-fab><span class="nav-fab" data-ico="plus"></span>Nouveau</button>
                 <button class="nav-item" data-tab="documents"><span class="nav-ico" data-ico="file"></span>Documents</button>
                 <button class="nav-item" data-tab="settings"><span class="nav-ico" data-ico="settings"></span>Réglages</button>
             </div>
         </nav>
 
-        <div id="toast" class="hidden fixed top-[calc(4.5rem+env(safe-area-inset-top))] md:top-5 md:bottom-auto left-1/2 -translate-x-1/2 z-[70] px-5 py-3 rounded-full bg-brand-plumDark text-brand-cream text-sm font-bold shadow-soft whitespace-nowrap"></div>
+        <div id="toast" class="hidden fixed top-[calc(4.5rem+env(safe-area-inset-top))] md:top-5 md:bottom-auto left-1/2 -translate-x-1/2 z-[70] max-w-[92vw] px-5 py-3 rounded-2xl sm:rounded-full bg-brand-plumDark text-brand-cream text-sm font-bold shadow-soft text-center"></div>
     </div>
 
     <!-- Confirmation -->
@@ -340,6 +411,20 @@
         </div>
     </div>
 
+    <!-- Aperçu plein écran (mobile) -->
+    <div id="preview-overlay" class="hidden fixed inset-0 z-[56] bg-brand-plumDark/75 flex flex-col">
+        <div class="flex items-center justify-between gap-2 px-4 py-3 bg-brand-plum text-brand-cream pt-[calc(0.75rem+env(safe-area-inset-top))]">
+            <span class="font-black text-sm">Aperçu du document</span>
+            <div class="flex gap-2">
+                <button id="ov-pdf" class="btn !min-h-[40px] !px-4 !text-xs bg-brand-cream text-brand-plum">PDF</button>
+                <button id="ov-close" class="btn !min-h-[40px] !px-4 !text-xs bg-white/15 text-brand-cream">Fermer</button>
+            </div>
+        </div>
+        <div class="flex-1 overflow-auto p-3 pb-8">
+            <article id="doc-overlay" class="doc-page mx-auto bg-white rounded-lg shadow-soft text-[12px] text-brand-plum"></article>
+        </div>
+    </div>
+
     <!-- Zone hors écran utilisée pour générer le PDF (une seule page A4) -->
     <div id="pdf-stage" aria-hidden="true"></div>
 
@@ -348,6 +433,18 @@
         const SUPABASE_URL = 'https://lkjlbtwreqtefinkhwsg.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_5iMONV7Cyd3BbOArHfuXwQ_dPyQ5lY7';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Empêche le zoom par pincement (iPhone et Android) et le double-tap
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+        document.addEventListener('gesturechange', (e) => e.preventDefault());
+        document.addEventListener('gestureend', (e) => e.preventDefault());
+        document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, { passive: false });
 
         const DEFAULT_ISSUER = {
             name: 'Guillaume CHARPEIL',
@@ -419,6 +516,7 @@
             users: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/><path d="M22 21a7 7 0 0 0-5-6.7"/>',
             file: '<path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/>',
             plus: '<path d="M12 5v14M5 12h14"/>',
+            inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z"/>',
             settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'
         };
         const svg = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
@@ -492,6 +590,7 @@
             renderDashboard();
             renderClients();
             renderDocuments();
+            await loadLeads();
         }
 
         // ===================== CARTE DOCUMENT =====================
@@ -532,7 +631,6 @@
             $('k-paid').textContent = eur(sum(invoices.filter((d) => d.status === 'paye')));
             $('k-pending').textContent = eur(sum(invoices.filter((d) => d.status === 'envoye')));
             $('k-quotes').textContent = eur(sum(quotes));
-            $('k-clients').textContent = clients.length;
 
             $('recent-docs').innerHTML = documents.slice(0, 5).map((d) => docCard(d, true)).join('')
                 || '<div class="card p-6 text-center text-sm opacity-60">Aucun document pour le moment.</div>';
@@ -635,11 +733,11 @@
         });
 
         // ===================== NAVIGATION =====================
-        const TAB_TITLES = { dashboard: 'Tableau de bord', clients: 'Clients', documents: 'Devis & factures', editor: 'Nouveau devis', settings: 'Paramètres' };
+        const TAB_TITLES = { dashboard: 'Tableau de bord', clients: 'Clients', documents: 'Devis & factures', leads: 'Demandes', editor: 'Nouveau devis', settings: 'Paramètres' };
 
         function switchTab(name) {
             activeTab = name;
-            ['dashboard', 'clients', 'documents', 'editor', 'settings'].forEach((t) => {
+            ['dashboard', 'clients', 'documents', 'leads', 'editor', 'settings'].forEach((t) => {
                 $('tab-' + t).classList.toggle('hidden', t !== name);
             });
             document.querySelectorAll('header .tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
@@ -775,6 +873,7 @@
 
         function newDocument() {
             current = null;
+            pendingLeadId = null;
             fillForm({ kind: 'devis', status: 'brouillon', number: '', issue_date: today(), validity_days: 30, deposit_percent: 0, micro: true, lines: [] });
         }
 
@@ -831,11 +930,6 @@
 
         $('btn-save').addEventListener('click', saveDocument);
 
-        // Ouvre l'aperçu et le fait défiler à l'écran (mobile)
-        $('btn-preview').addEventListener('click', () => {
-            $('preview-wrap').open = true;
-            $('preview-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
 
         async function saveDocument() {
             const f = readForm();
@@ -905,6 +999,13 @@
                 if (f.lines.length) {
                     const { error: insErr } = await sb.from('document_lines').insert(f.lines.map((l) => ({ ...l, document_id: docId })));
                     if (insErr) throw insErr;
+                }
+
+                // Si le devis vient d'une demande du site, on lie les deux
+                if (pendingLeadId) {
+                    const { error: leadErr } = await sb.from('leads').update({ status: 'devis_cree', document_id: docId }).eq('id', pendingLeadId);
+                    if (leadErr) throw leadErr;
+                    pendingLeadId = null;
                 }
 
                 toast(`${number} enregistré`);
@@ -1121,6 +1222,161 @@
                     ${esc(i.name)}${i.brand ? ' · ' + esc(i.brand) : ''}${i.siret ? ' · SIRET ' + esc(i.siret) : ''}
                 </div>`;
         }
+
+        // ===================== DEMANDES DE DEVIS =====================
+        let leads = [];
+        let leadFilter = '';
+        let selectedLead = null;
+        let pendingLeadId = null;
+
+        const LEAD_STATUS = { nouveau: 'Nouvelle', en_cours: 'En cours', devis_cree: 'Devis créé', traite: 'Traitée', annule: 'Annulée' };
+        const LEAD_STYLE = {
+            nouveau: 'bg-amber-100 text-amber-900',
+            en_cours: 'bg-sky-100 text-sky-900',
+            devis_cree: 'bg-violet-100 text-violet-900',
+            traite: 'bg-emerald-100 text-emerald-900',
+            annule: 'bg-red-100 text-red-900'
+        };
+
+        async function loadLeads() {
+            const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false });
+            if (error) { console.error(error); return; }
+            leads = data || [];
+            const toDo = leads.filter((l) => l.status === 'nouveau').length;
+            $('k-leads').textContent = toDo;
+            document.querySelectorAll('.leads-badge').forEach((b) => {
+                b.textContent = toDo;
+                b.classList.toggle('hidden', toDo === 0);
+            });
+            renderLeads();
+        }
+
+        function renderLeads() {
+            const list = leads.filter((l) => !leadFilter || l.status === leadFilter);
+            $('leads-list').innerHTML = list.map((l) => `
+                <button data-lead="${l.id}" class="card w-full p-4 text-left active:bg-brand-beige/40">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-black uppercase tracking-wider opacity-55">${fmtDate(l.created_at.slice(0, 10))} · ${esc(l.ville || 'Ville non renseignée')}</p>
+                            <p class="font-black truncate">${esc(l.name)}</p>
+                            <p class="text-sm opacity-65 truncate">${esc(l.prestation || '—')}</p>
+                        </div>
+                        <span class="status-pill shrink-0 ${LEAD_STYLE[l.status] || ''}">${LEAD_STATUS[l.status] || l.status}</span>
+                    </div>
+                    <p class="text-xs opacity-55 mt-2">${(l.photo_paths || []).length} photo(s)</p>
+                </button>`).join('') || '<div class="card p-6 text-center text-sm opacity-60">Aucune demande pour le moment.</div>';
+        }
+
+        $('lead-chips').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-lead-filter]');
+            if (!b) return;
+            leadFilter = b.dataset.leadFilter;
+            document.querySelectorAll('#lead-chips .chip').forEach((c) => c.classList.toggle('active', c === b));
+            renderLeads();
+        });
+
+        $('leads-list').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-lead]');
+            if (b) openLead(b.dataset.lead);
+        });
+
+        async function openLead(id) {
+            const l = leads.find((x) => x.id === id);
+            if (!l) return;
+            selectedLead = l;
+            $('leads-list-view').classList.add('hidden');
+            $('lead-detail-view').classList.remove('hidden');
+            $('ld-date').textContent = 'Reçue le ' + new Date(l.created_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+            $('ld-name').textContent = l.name;
+            $('ld-type').textContent = l.client_type || '';
+            $('ld-status').className = 'status-pill ' + (LEAD_STYLE[l.status] || '');
+            $('ld-status').textContent = LEAD_STATUS[l.status] || l.status;
+            $('ld-email').textContent = l.email || '—';
+            $('ld-email').href = l.email ? 'mailto:' + l.email : '#';
+            $('ld-phone').textContent = l.phone || '—';
+            $('ld-phone').href = l.phone ? 'tel:' + l.phone.replace(/\s/g, '') : '#';
+            $('ld-address').textContent = l.adresse || '—';
+            $('ld-ville').textContent = l.ville || '—';
+            $('ld-prestation').textContent = l.prestation || '—';
+            $('ld-details').textContent = l.details || '—';
+            $('ld-status-select').value = l.status;
+
+            const linked = l.document_id ? documents.find((d) => d.id === l.document_id) : null;
+            $('ld-linked').classList.toggle('hidden', !l.document_id);
+            $('ld-linked').textContent = 'Devis lié : ' + (linked ? linked.number : 'voir Devis & factures');
+
+            // Photos (liens temporaires, bucket privé)
+            const box = $('ld-photos');
+            box.innerHTML = (l.photo_paths || []).length ? '' : '<p class="text-sm opacity-60 col-span-full">Aucune photo.</p>';
+            for (const path of (l.photo_paths || [])) {
+                const { data } = await sb.storage.from('leads').createSignedUrl(path, 3600);
+                const a = document.createElement('a');
+                a.className = 'block aspect-square rounded-xl overflow-hidden bg-brand-cream border border-brand-plum/10';
+                if (data?.signedUrl) {
+                    a.href = data.signedUrl;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    a.innerHTML = `<img src="${data.signedUrl}" alt="Photo de la demande" class="w-full h-full object-cover">`;
+                } else {
+                    a.innerHTML = '<span class="p-2 text-xs">Photo indisponible</span>';
+                }
+                box.appendChild(a);
+            }
+            window.scrollTo(0, 0);
+        }
+
+        $('lead-back').addEventListener('click', () => {
+            selectedLead = null;
+            $('lead-detail-view').classList.add('hidden');
+            $('leads-list-view').classList.remove('hidden');
+        });
+
+        $('ld-status-select').addEventListener('change', async (e) => {
+            if (!selectedLead) return;
+            const id = selectedLead.id;
+            const { error } = await sb.from('leads').update({ status: e.target.value }).eq('id', id);
+            if (error) return toast('Erreur : ' + error.message, true);
+            toast('Statut mis à jour');
+            await loadLeads();
+            openLead(id);
+        });
+
+        // Reprend la demande dans l'éditeur de devis
+        $('ld-make-devis').addEventListener('click', () => {
+            const l = selectedLead;
+            if (!l) return;
+            newDocument();
+            pendingLeadId = l.id;
+            $('e-kind').value = 'devis';
+            $('e-object').value = l.prestation || '';
+            $('e-notes').value = [l.details, l.ville ? 'Ville : ' + l.ville : ''].filter(Boolean).join('\n');
+            document.querySelectorAll('input[name="c-type"]').forEach((r) => { r.checked = r.value === (l.client_type || 'Particulier'); });
+            $('c-name').value = l.name;
+            $('c-address').value = [l.adresse, l.ville].filter(Boolean).join('\n');
+            $('c-email').value = l.email || '';
+            $('c-phone').value = l.phone || '';
+            $('c-siret').value = '';
+            $('e-client').value = '';
+            currentClientId = null;
+            refreshPreview();
+            switchTab('editor');
+            toast('Demande reprise : ajoutez les prestations et enregistrez');
+        });
+
+        // ===================== APERÇU PLEIN ÉCRAN (mobile) =====================
+        $('btn-preview').addEventListener('click', () => {
+            refreshPreview();
+            if (window.innerWidth < 1280) {
+                $('doc-overlay').innerHTML = $('doc').innerHTML;
+                $('preview-overlay').classList.remove('hidden');
+                $('preview-overlay').scrollTop = 0;
+            } else {
+                $('preview-wrap').open = true;
+                $('preview-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        $('ov-close').addEventListener('click', () => $('preview-overlay').classList.add('hidden'));
+        $('ov-pdf').addEventListener('click', () => $('btn-pdf').click());
 
         // ===================== DÉMARRAGE =====================
         (async () => {
