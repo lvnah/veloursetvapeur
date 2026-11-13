@@ -126,6 +126,7 @@
                 <nav class="hidden md:flex items-center gap-1" aria-label="Navigation">
                     <button class="tab-btn" data-tab="dashboard">Tableau de bord</button>
                     <button class="tab-btn" data-tab="leads">Demandes <span class="leads-badge hidden ml-1 inline-block min-w-[18px] px-1 rounded-full bg-amber-400 text-brand-plumDark text-[10px] font-black leading-[18px] text-center">0</span></button>
+                    <button class="tab-btn" data-tab="reviews">Avis <span class="reviews-badge hidden ml-1 inline-block min-w-[18px] px-1 rounded-full bg-amber-400 text-brand-plumDark text-[10px] font-black leading-[18px] text-center">0</span></button>
                     <button class="tab-btn" data-tab="clients">Clients</button>
                     <button class="tab-btn" data-tab="documents">Devis &amp; factures</button>
                     <button class="tab-btn" data-tab="editor">Nouveau</button>
@@ -359,8 +360,22 @@
                 </div>
             </section>
 
+            <!-- AVIS CLIENTS -->
+            <section id="tab-reviews" class="hidden space-y-4 fade-in">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black">Avis clients</h2>
+                    <p class="text-sm opacity-65">Avis déposés depuis l'accueil. Validez-les pour les publier sur le site.</p>
+                </div>
+                <div class="no-scrollbar flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0" id="review-chips">
+                    <button class="chip active" data-review-filter="pending">En attente</button>
+                    <button class="chip" data-review-filter="approved">Publiés</button>
+                    <button class="chip" data-review-filter="all">Tous</button>
+                </div>
+                <div id="reviews-list" class="space-y-3"></div>
+            </section>
+
             <!-- PARAMÈTRES -->
-            <section id="tab-settings" class="hidden max-w-2xl mx-auto fade-in">
+            <section id="tab-settings"class="hidden max-w-2xl mx-auto fade-in">
                 <h2 class="text-xl sm:text-2xl font-black mb-4">Paramètres</h2>
                 <form id="settings-form" class="card p-5 sm:p-6 space-y-4">
                     <h3 class="text-xs font-black uppercase tracking-wider opacity-70">Mes coordonnées</h3>
@@ -385,6 +400,7 @@
             <div class="flex items-end justify-around px-2">
                 <button class="nav-item" data-tab="dashboard"><span class="nav-ico" data-ico="home"></span>Accueil</button>
                 <button class="nav-item relative" data-tab="leads"><span class="nav-ico" data-ico="inbox"></span><span class="leads-badge hidden absolute top-1 left-1/2 ml-2.5 min-w-[18px] px-1 rounded-full bg-amber-400 text-brand-plumDark text-[10px] font-black leading-[18px] text-center">0</span>Demandes</button>
+                <button class="nav-item relative" data-tab="reviews"><span class="nav-ico" data-ico="star"></span><span class="reviews-badge hidden absolute top-1 left-1/2 ml-2.5 min-w-[18px] px-1 rounded-full bg-amber-400 text-brand-plumDark text-[10px] font-black leading-[18px] text-center">0</span>Avis</button>
                 <button class="nav-item" data-tab="editor" data-fab><span class="nav-fab" data-ico="plus"></span>Nouveau</button>
                 <button class="nav-item" data-tab="documents"><span class="nav-ico" data-ico="file"></span>Documents</button>
                 <button class="nav-item" data-tab="settings"><span class="nav-ico" data-ico="settings"></span>Réglages</button>
@@ -516,6 +532,7 @@
             users: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/><path d="M22 21a7 7 0 0 0-5-6.7"/>',
             file: '<path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/>',
             plus: '<path d="M12 5v14M5 12h14"/>',
+            star: '<path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
             inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z"/>',
             settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'
         };
@@ -591,6 +608,7 @@
             renderClients();
             renderDocuments();
             await loadLeads();
+            await loadReviews();
         }
 
         // ===================== CARTE DOCUMENT =====================
@@ -733,11 +751,11 @@
         });
 
         // ===================== NAVIGATION =====================
-        const TAB_TITLES = { dashboard: 'Tableau de bord', clients: 'Clients', documents: 'Devis & factures', leads: 'Demandes', editor: 'Nouveau devis', settings: 'Paramètres' };
+        const TAB_TITLES = { dashboard: 'Tableau de bord', clients: 'Clients', documents: 'Devis & factures', leads: 'Demandes', reviews: 'Avis clients', editor: 'Nouveau devis', settings: 'Paramètres' };
 
         function switchTab(name) {
             activeTab = name;
-            ['dashboard', 'clients', 'documents', 'leads', 'editor', 'settings'].forEach((t) => {
+            ['dashboard', 'clients', 'documents', 'leads', 'reviews', 'editor', 'settings'].forEach((t) => {
                 $('tab-' + t).classList.toggle('hidden', t !== name);
             });
             document.querySelectorAll('header .tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
@@ -1237,6 +1255,71 @@
             traite: 'bg-emerald-100 text-emerald-900',
             annule: 'bg-red-100 text-red-900'
         };
+
+        let reviews = [];
+        let reviewFilter = 'pending';
+
+        async function loadReviews() {
+            const { data, error } = await sb.from('reviews').select('*').order('created_at', { ascending: false });
+            if (error) { console.error(error); return; }
+            reviews = data || [];
+            const pending = reviews.filter((r) => !r.approved).length;
+            document.querySelectorAll('.reviews-badge').forEach((b) => {
+                b.textContent = pending;
+                b.classList.toggle('hidden', pending === 0);
+            });
+            renderReviews();
+        }
+
+        function renderReviews() {
+            const list = reviews.filter((r) => reviewFilter === 'all' || (reviewFilter === 'pending' ? !r.approved : r.approved));
+            $('reviews-list').innerHTML = list.length ? list.map((r) => `
+                <div class="card p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-black uppercase tracking-wider opacity-55">${fmtDate(r.created_at.slice(0, 10))} · ${esc(r.ville)} · ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</p>
+                            <p class="font-black truncate">${esc(r.name)}</p>
+                        </div>
+                        <span class="shrink-0 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${r.approved ? 'bg-emerald-100 text-emerald-900' : 'bg-amber-100 text-amber-900'}">${r.approved ? 'Publié' : 'En attente'}</span>
+                    </div>
+                    <p class="mt-2 text-sm opacity-80 whitespace-pre-line">${esc(r.message)}</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        ${r.approved
+                            ? `<button class="btn btn-ghost" data-review-unpublish="${r.id}">Dépublier</button>`
+                            : `<button class="btn btn-primary" data-review-approve="${r.id}">Valider et publier</button>`}
+                        <button class="btn btn-ghost btn-danger" data-review-delete="${r.id}">Supprimer</button>
+                    </div>
+                </div>`).join('') : '<p class="text-sm opacity-60 py-6 text-center">Aucun avis dans cette liste.</p>';
+        }
+
+        $('review-chips').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-review-filter]');
+            if (!b) return;
+            reviewFilter = b.dataset.reviewFilter;
+            document.querySelectorAll('#review-chips .chip').forEach((c) => c.classList.toggle('active', c === b));
+            renderReviews();
+        });
+
+        $('reviews-list').addEventListener('click', async (e) => {
+            const toggle = e.target.closest('[data-review-approve], [data-review-unpublish]');
+            const del = e.target.closest('[data-review-delete]');
+            if (toggle) {
+                const publish = toggle.hasAttribute('data-review-approve');
+                const id = toggle.dataset.reviewApprove || toggle.dataset.reviewUnpublish;
+                const { error } = await sb.from('reviews').update({ approved: publish }).eq('id', id);
+                if (error) return toast("Impossible de mettre à jour l'avis.", true);
+                toast(publish ? 'Avis publié sur le site.' : 'Avis dépublié.');
+                await loadReviews();
+            }
+            if (del) {
+                const ok = await confirmModal({ title: 'Supprimer cet avis ?', text: 'Il sera définitivement supprimé.', okLabel: 'Supprimer', danger: true });
+                if (!ok) return;
+                const { error } = await sb.from('reviews').delete().eq('id', del.dataset.reviewDelete);
+                if (error) return toast('Suppression impossible.', true);
+                toast('Avis supprimé.');
+                await loadReviews();
+            }
+        });
 
         async function loadLeads() {
             const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false });
