@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Administration | Velours & Vapeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        brand: { plum: '#4a1531', plumDark: '#2d0c1d', plumLight: '#73234d', cream: '#fcfaf8', beige: '#f0e8df' }
+                    },
+                    boxShadow: { soft: '0 20px 50px -28px rgba(74, 21, 49, .28)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        .doc-page { width: 210mm; min-height: 297mm; }
+        input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], textarea, select {
+            width: 100%;
+            padding: .6rem .75rem;
+            background: #fcfaf8;
+            border: 1px solid rgba(74, 21, 49, .12);
+            border-radius: .75rem;
+            font-size: .875rem;
+            color: #4a1531;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #4a1531; box-shadow: 0 0 0 1px #4a1531; }
+        .label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(74, 21, 49, .7); margin-bottom: .35rem; }
+        @media print {
+            body { background: #fff !important; }
+            .no-print { display: none !important; }
+            .print-area { padding: 0 !important; margin: 0 !important; }
+            .doc-page { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; }
+            @page { size: A4; margin: 10mm; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+
+<body class="bg-brand-cream text-brand-plum font-sans antialiased min-h-screen">
+
+    <!-- ÉCRAN DE CONNEXION -->
+    <div id="login" class="min-h-screen flex items-center justify-center p-4">
+        <form id="login-form" class="w-full max-w-sm bg-white rounded-[24px] shadow-soft border border-brand-plum/5 p-8 space-y-6">
+            <div class="text-center space-y-3">
+                <img src="../images/logo.png" alt="Velours & Vapeur" class="h-10 mx-auto bg-brand-plum rounded-xl px-3 py-2">
+                <h1 class="text-xl font-black">Espace administration</h1>
+                <p class="text-xs text-brand-plum/60">Accès réservé</p>
+            </div>
+            <div>
+                <label class="label" for="pwd">Mot de passe</label>
+                <input type="password" id="pwd" autocomplete="current-password" required>
+            </div>
+            <p id="login-error" class="hidden text-xs font-bold text-red-700">Mot de passe incorrect.</p>
+            <button type="submit" class="w-full bg-brand-plum text-brand-cream py-3.5 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight transition-colors">Se connecter</button>
+        </form>
+    </div>
+
+    <!-- APPLICATION -->
+    <div id="app" class="hidden">
+        <header class="no-print sticky top-0 z-30 bg-brand-plum text-brand-cream">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="../images/logo.png" alt="Velours & Vapeur" class="h-8 w-auto">
+                    <span class="hidden sm:inline text-xs font-bold uppercase tracking-widest opacity-70">Devis</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-new" class="text-xs font-bold px-4 py-2 rounded-full bg-white/10 hover:bg-white/20">Nouveau</button>
+                    <button id="btn-list" class="text-xs font-bold px-4 py-2 rounded-full bg-white/10 hover:bg-white/20">Mes devis</button>
+                    <button id="btn-print" class="text-xs font-bold px-4 py-2 rounded-full bg-brand-cream text-brand-plum hover:bg-brand-beige">Imprimer / PDF</button>
+                    <button id="btn-logout" class="text-xs font-bold px-3 py-2 opacity-70 hover:opacity-100">Quitter</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-[1400px] mx-auto p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-[440px_1fr] gap-6">
+
+            <!-- FORMULAIRE -->
+            <aside class="no-print space-y-5">
+                <section class="bg-white rounded-2xl border border-brand-plum/5 shadow-soft p-5 space-y-4">
+                    <h2 class="text-sm font-black uppercase tracking-wider">Devis</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="label" for="f-number">Numéro</label><input type="text" id="f-number"></div>
+                        <div><label class="label" for="f-date">Date</label><input type="date" id="f-date"></div>
+                        <div><label class="label" for="f-validity">Validité (jours)</label><input type="number" id="f-validity" min="1"></div>
+                        <div><label class="label" for="f-deposit">Acompte (%)</label><input type="number" id="f-deposit" min="0" max="100"></div>
+                    </div>
+                    <div>
+                        <label class="label" for="f-object">Objet de la prestation</label>
+                        <input type="text" id="f-object" placeholder="Ex: Nettoyage canapé et matelas">
+                    </div>
+                </section>
+
+                <section class="bg-white rounded-2xl border border-brand-plum/5 shadow-soft p-5 space-y-4">
+                    <h2 class="text-sm font-black uppercase tracking-wider">Client</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 text-xs font-bold p-2.5 rounded-xl border border-brand-plum/10 cursor-pointer"><input type="radio" name="c-type" value="Particulier" class="accent-brand-plum"> Particulier</label>
+                        <label class="flex items-center gap-2 text-xs font-bold p-2.5 rounded-xl border border-brand-plum/10 cursor-pointer"><input type="radio" name="c-type" value="Professionnel" class="accent-brand-plum"> Professionnel</label>
+                    </div>
+                    <div><label class="label" for="c-name">Nom / Entreprise</label><input type="text" id="c-name"></div>
+                    <div><label class="label" for="c-address">Adresse</label><textarea id="c-address" rows="2"></textarea></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="label" for="c-email">Email</label><input type="email" id="c-email"></div>
+                        <div><label class="label" for="c-phone">Téléphone</label><input type="tel" id="c-phone"></div>
+                    </div>
+                    <div><label class="label" for="c-siret">SIRET (si professionnel)</label><input type="text" id="c-siret"></div>
+                </section>
+
+                <section class="bg-white rounded-2xl border border-brand-plum/5 shadow-soft p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-black uppercase tracking-wider">Prestations</h2>
+                        <button id="btn-add-line" class="text-xs font-bold px-3 py-1.5 rounded-full bg-brand-plum text-brand-cream">+ Ligne</button>
+                    </div>
+                    <div id="lines" class="space-y-3"></div>
+                    <div class="flex items-center gap-2 text-xs font-medium pt-2 border-t border-brand-plum/10">
+                        <input type="checkbox" id="f-micro" class="accent-brand-plum w-4 h-4">
+                        <label for="f-micro">TVA non applicable, art. 293 B du CGI (micro-entreprise)</label>
+                    </div>
+                </section>
+
+                <section class="bg-white rounded-2xl border border-brand-plum/5 shadow-soft p-5 space-y-4">
+                    <h2 class="text-sm font-black uppercase tracking-wider">Notes</h2>
+                    <textarea id="f-notes" rows="3" placeholder="Informations complémentaires affichées sur le devis"></textarea>
+                </section>
+
+                <section class="bg-white rounded-2xl border border-brand-plum/5 shadow-soft p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-black uppercase tracking-wider">Mes coordonnées</h2>
+                        <span class="text-[10px] font-bold uppercase tracking-wider opacity-50">Enregistrées</span>
+                    </div>
+                    <div><label class="label" for="i-name">Nom</label><input type="text" id="i-name"></div>
+                    <div><label class="label" for="i-brand">Enseigne</label><input type="text" id="i-brand"></div>
+                    <div><label class="label" for="i-address">Adresse</label><textarea id="i-address" rows="2"></textarea></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="label" for="i-email">Email</label><input type="email" id="i-email"></div>
+                        <div><label class="label" for="i-phone">Téléphone</label><input type="tel" id="i-phone"></div>
+                    </div>
+                    <div><label class="label" for="i-siret">SIRET</label><input type="text" id="i-siret"></div>
+                </section>
+
+                <div class="flex gap-2">
+                    <button id="btn-save" class="flex-1 bg-brand-plum text-brand-cream py-3.5 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight">Enregistrer le devis</button>
+                </div>
+                <p id="save-msg" class="hidden text-xs font-bold text-emerald-800">Devis enregistré.</p>
+            </aside>
+
+            <!-- APERÇU -->
+            <main class="print-area">
+                <div class="no-print mb-3 text-xs font-bold uppercase tracking-wider opacity-60">Aperçu</div>
+                <div class="overflow-auto">
+                    <article id="doc" class="doc-page mx-auto bg-white shadow-soft border border-brand-plum/5 text-[12px] text-brand-plum">
+                        <!-- Rendu par JavaScript -->
+                    </article>
+                </div>
+            </main>
+        </div>
+
+        <!-- LISTE DES DEVIS -->
+        <div id="list-modal" class="no-print hidden fixed inset-0 z-40 bg-brand-plumDark/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-soft w-full max-w-2xl max-h-[85vh] flex flex-col">
+                <div class="flex items-center justify-between p-5 border-b border-brand-plum/10">
+                    <h2 class="font-black">Mes devis</h2>
+                    <button id="list-close" class="text-xs font-bold px-3 py-1.5 rounded-full bg-brand-beige">Fermer</button>
+                </div>
+                <div id="list-body" class="p-5 overflow-auto space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== Accès : on compare le SHA-256 du mot de passe, le mot de passe n'apparaît pas dans le code =====
+        const PASSWORD_HASH = '3a32f8ea59a87c062c49c20bad89433112f9484dc9caeb9320030d91995b4f9f';
+
+        const $ = (id) => document.getElementById(id);
+        const store = {
+            get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
+            set(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+        };
+
+        const DEFAULT_ISSUER = {
+            name: 'Guillaume CHARPEIL',
+            brand: 'Velours & Vapeur',
+            address: '7 chemin des jardins\n66350 Toulouges, France',
+            email: 'veloursetvapeur@gmail.com',
+            phone: '06 95 79 57 91',
+            siret: '938 963 474 00015'
+        };
+
+        let draft = null;
+
+        // ----- Connexion -----
+        async function sha256Hex(text) {
+            const data = new TextEncoder().encode(text);
+            const buf = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function showApp() {
+            $('login').classList.add('hidden');
+            $('app').classList.remove('hidden');
+            loadIssuer();
+            newDraft();
+        }
+
+        $('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hash = await sha256Hex($('pwd').value);
+            if (hash === PASSWORD_HASH) {
+                sessionStorage.setItem('vv-admin', '1');
+                $('login-error').classList.add('hidden');
+                showApp();
+            } else {
+                $('login-error').classList.remove('hidden');
+            }
+        });
+
+        $('btn-logout').addEventListener('click', () => {
+            sessionStorage.removeItem('vv-admin');
+            location.reload();
+        });
+
+        // ----- Numérotation -----
+        function nextNumber() {
+            const year = new Date().getFullYear();
+            const counter = store.get('vv-counter', 0) + 1;
+            return `D-${year}-${String(counter).padStart(3, '0')}`;
+        }
+
+        // ----- Coordonnées de l'émetteur -----
+        function loadIssuer() {
+            const issuer = { ...DEFAULT_ISSUER, ...store.get('vv-issuer', {}) };
+            $('i-name').value = issuer.name;
+            $('i-brand').value = issuer.brand;
+            $('i-address').value = issuer.address;
+            $('i-email').value = issuer.email;
+            $('i-phone').value = issuer.phone;
+            $('i-siret').value = issuer.siret;
+        }
+
+        function readIssuer() {
+            return {
+                name: $('i-name').value,
+                brand: $('i-brand').value,
+                address: $('i-address').value,
+                email: $('i-email').value,
+                phone: $('i-phone').value,
+                siret: $('i-siret').value
+            };
+        }
+
+        // ----- Lignes -----
+        function lineRow(line = {}) {
+            const row = document.createElement('div');
+            row.className = 'rounded-xl border border-brand-plum/10 p-3 space-y-2 bg-brand-cream/50';
+            row.innerHTML = `
+                <textarea class="l-desc" rows="2" placeholder="Description (ex: Nettoyage canapé 3 places)">${escapeHtml(line.desc || '')}</textarea>
+                <div class="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
+                    <div><span class="label">Qté</span><input type="number" class="l-qty" min="0" step="1" value="${line.qty ?? 1}"></div>
+                    <div><span class="label">Unité</span><input type="text" class="l-unit" value="${escapeHtml(line.unit ?? 'unité')}"></div>
+                    <div><span class="label">Prix unit. HT (€)</span><input type="number" class="l-price" min="0" step="0.01" value="${line.price ?? 0}"></div>
+                    <button type="button" class="l-del mb-0.5 text-xs font-bold px-2.5 py-2 rounded-lg text-red-800 hover:bg-red-50" aria-label="Supprimer la ligne">✕</button>
+                </div>`;
+            row.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('input', syncFromForm));
+            row.querySelector('.l-del').addEventListener('click', () => { row.remove(); syncFromForm(); });
+            return row;
+        }
+
+        function readLines() {
+            return Array.from($('lines').children).map((row) => ({
+                desc: row.querySelector('.l-desc').value,
+                qty: parseFloat(row.querySelector('.l-qty').value) || 0,
+                unit: row.querySelector('.l-unit').value,
+                price: parseFloat(row.querySelector('.l-price').value) || 0
+            }));
+        }
+
+        // ----- Brouillon <-> formulaire -----
+        function fillForm(d) {
+            $('f-number').value = d.number;
+            $('f-date').value = d.date;
+            $('f-validity').value = d.validity;
+            $('f-deposit').value = d.deposit;
+            $('f-object').value = d.object;
+            document.querySelectorAll('input[name="c-type"]').forEach((r) => { r.checked = r.value === d.client.type; });
+            $('c-name').value = d.client.name;
+            $('c-address').value = d.client.address;
+            $('c-email').value = d.client.email;
+            $('c-phone').value = d.client.phone;
+            $('c-siret').value = d.client.siret;
+            $('f-micro').checked = d.micro;
+            $('f-notes').value = d.notes;
+            $('lines').innerHTML = '';
+            (d.lines.length ? d.lines : [{}]).forEach((l) => $('lines').appendChild(lineRow(l)));
+        }
+
+        function readForm() {
+            const type = document.querySelector('input[name="c-type"]:checked');
+            return {
+                number: $('f-number').value,
+                date: $('f-date').value,
+                validity: parseInt($('f-validity').value, 10) || 30,
+                deposit: parseFloat($('f-deposit').value) || 0,
+                object: $('f-object').value,
+                client: {
+                    type: type ? type.value : 'Particulier',
+                    name: $('c-name').value,
+                    address: $('c-address').value,
+                    email: $('c-email').value,
+                    phone: $('c-phone').value,
+                    siret: $('c-siret').value
+                },
+                micro: $('f-micro').checked,
+                notes: $('f-notes').value,
+                lines: readLines(),
+                issuer: readIssuer()
+            };
+        }
+
+        function newDraft() {
+            const today = new Date().toISOString().slice(0, 10);
+            draft = {
+                id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+                number: nextNumber(),
+                date: today,
+                validity: 30,
+                deposit: 0,
+                object: '',
+                client: { type: 'Particulier', name: '', address: '', email: '', phone: '', siret: '' },
+                micro: true,
+                notes: '',
+                lines: [{ desc: '', qty: 1, unit: 'unité', price: 0 }]
+            };
+            fillForm(draft);
+            render();
+        }
+
+        // ----- Calculs et rendu -----
+        const eur = (n) => n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        const fmtDate = (iso) => iso ? new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR') : '';
+        const addDays = (iso, days) => { const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); };
+        function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+        function nl2br(s) { return escapeHtml(s).replace(/\n/g, '<br>'); }
+
+        function renderDoc(d) {
+            const lines = d.lines.filter((l) => l.desc || l.price);
+            const total = lines.reduce((acc, l) => acc + l.qty * l.price, 0);
+            const vat = d.micro ? 0 : total * 0.2;
+            const ttc = total + vat;
+            const deposit = d.deposit > 0 ? ttc * d.deposit / 100 : 0;
+            const validUntil = addDays(d.date, d.validity);
+            const i = d.issuer;
+
+            const rows = lines.map((l, idx) => `
+                <tr class="border-b border-brand-plum/10">
+                    <td class="py-2.5 px-2 align-top text-center opacity-70">${idx + 1}</td>
+                    <td class="py-2.5 px-2 align-top whitespace-pre-line">${escapeHtml(l.desc)}</td>
+                    <td class="py-2.5 px-2 align-top text-center">${escapeHtml(l.unit)}</td>
+                    <td class="py-2.5 px-2 align-top text-right">${l.qty}</td>
+                    <td class="py-2.5 px-2 align-top text-right">${eur(l.price)}</td>
+                    <td class="py-2.5 px-2 align-top text-right font-bold">${eur(l.qty * l.price)}</td>
+                </tr>`).join('');
+
+            $('doc').innerHTML = `
+                <div class="bg-brand-plum text-brand-cream px-10 py-7 flex items-center justify-between print:bg-brand-plum">
+                    <img src="../images/logo.png" alt="Velours & Vapeur" class="h-14 w-auto">
+                    <div class="text-right">
+                        <p class="text-[10px] uppercase tracking-[0.25em] opacity-70">Devis</p>
+                        <p class="text-xl font-black">${escapeHtml(d.number)}</p>
+                    </div>
+                </div>
+
+                <div class="px-10 pt-8 pb-10 space-y-8">
+                    <div class="grid grid-cols-2 gap-8">
+                        <div class="space-y-1">
+                            <p class="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-2">Émetteur</p>
+                            <p class="font-black text-sm">${escapeHtml(i.name)}</p>
+                            ${i.brand ? `<p>${escapeHtml(i.brand)}</p>` : ''}
+                            <p>${nl2br(i.address)}</p>
+                            ${i.email ? `<p>${escapeHtml(i.email)}</p>` : ''}
+                            ${i.phone ? `<p>${escapeHtml(i.phone)}</p>` : ''}
+                            ${i.siret ? `<p>SIRET : ${escapeHtml(i.siret)}</p>` : ''}
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-2">Client</p>
+                            <p class="font-black text-sm">${escapeHtml(d.client.name)}</p>
+                            <p>${nl2br(d.client.address)}</p>
+                            ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
+                            ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
+                            ${d.client.type === 'Professionnel' && d.client.siret ? `<p>SIRET : ${escapeHtml(d.client.siret)}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 bg-brand-cream rounded-xl p-4 text-[11px]">
+                        <div><p class="opacity-60 uppercase tracking-wider font-bold">Date du devis</p><p class="font-bold text-sm mt-1">${fmtDate(d.date)}</p></div>
+                        <div><p class="opacity-60 uppercase tracking-wider font-bold">Valable jusqu'au</p><p class="font-bold text-sm mt-1">${fmtDate(validUntil)}</p></div>
+                        <div><p class="opacity-60 uppercase tracking-wider font-bold">Validité</p><p class="font-bold text-sm mt-1">${d.validity} jours</p></div>
+                    </div>
+
+                    ${d.object ? `<p class="text-base font-black">${escapeHtml(d.object)}</p>` : ''}
+
+                    <table class="w-full text-[11px]">
+                        <thead>
+                            <tr class="bg-brand-plum text-brand-cream">
+                                <th class="py-2 px-2 w-10 text-center font-bold">#</th>
+                                <th class="py-2 px-2 text-left font-bold">Désignation</th>
+                                <th class="py-2 px-2 text-center font-bold">Unité</th>
+                                <th class="py-2 px-2 text-right font-bold">Qté</th>
+                                <th class="py-2 px-2 text-right font-bold">P.U. HT</th>
+                                <th class="py-2 px-2 text-right font-bold">Montant HT</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows || `<tr><td colspan="6" class="py-6 text-center opacity-50">Aucune prestation</td></tr>`}</tbody>
+                    </table>
+
+                    <div class="grid grid-cols-2 gap-8 items-start">
+                        <div class="space-y-3 text-[11px]">
+                            ${d.notes ? `<div><p class="font-bold uppercase tracking-wider opacity-60 mb-1">Notes</p><p class="whitespace-pre-line">${escapeHtml(d.notes)}</p></div>` : ''}
+                            <div>
+                                <p class="font-bold uppercase tracking-wider opacity-60 mb-1">Conditions</p>
+                                <p>Devis valable ${d.validity} jours à compter de sa date d'émission.</p>
+                                ${d.deposit > 0 ? `<p>Acompte à la commande : ${d.deposit} % soit ${eur(deposit)}.</p>` : ''}
+                                <p>Pénalités de retard : 3 fois le taux d'intérêt légal.</p>
+                                <p>Indemnité forfaitaire pour frais de recouvrement : 40 €.</p>
+                                <p>Pas d'escompte en cas de paiement anticipé.</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between py-1.5 border-b border-brand-plum/10"><span>Total HT</span><span class="font-bold">${eur(total)}</span></div>
+                            ${d.micro
+                                ? `<p class="text-[10px] opacity-70">TVA non applicable, art. 293 B du CGI.</p>`
+                                : `<div class="flex justify-between py-1.5 border-b border-brand-plum/10"><span>TVA (20 %)</span><span>${eur(vat)}</span></div>`}
+                            <div class="flex justify-between py-2.5 px-3 mt-2 rounded-xl bg-brand-plum text-brand-cream font-black"><span>Total TTC</span><span>${eur(ttc)}</span></div>
+                            ${d.deposit > 0 ? `<div class="flex justify-between py-1.5 text-xs"><span>Acompte à verser</span><span class="font-bold">${eur(ttc * d.deposit / 100)}</span></div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-8 pt-6 text-[11px]">
+                        <div class="border border-brand-plum/20 rounded-xl p-4 h-28">
+                            <p class="font-bold">Bon pour accord</p>
+                            <p class="opacity-60 mt-1">Date et signature du client, précédées de la mention « Lu et approuvé »</p>
+                        </div>
+                        <div class="text-right text-[10px] opacity-60 self-end">Merci de votre confiance !</div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-plumDark text-brand-cream/70 text-[9px] text-center py-3 print:bg-brand-plumDark">
+                    ${escapeHtml(i.name)}${i.brand ? ' · ' + escapeHtml(i.brand) : ''}${i.siret ? ' · SIRET ' + escapeHtml(i.siret) : ''}
+                </div>`;
+        }
+
+        function syncFromForm() {
+            draft = readForm();
+            draft.id = draft.id || crypto.randomUUID();
+            renderDoc(draft);
+        }
+
+        function render() { renderDoc(draft); }
+
+        // ----- Sauvegarde et liste -----
+        function saveDraft() {
+            const d = readForm();
+            const list = store.get('vv-devis', []);
+            const idx = list.findIndex((x) => x.number === d.number);
+            const entry = { ...d, savedAt: new Date().toISOString() };
+            if (idx >= 0) list[idx] = entry; else list.unshift(entry);
+            store.set('vv-devis', list);
+
+            // Met à jour le compteur si le numéro suit la séquence
+            const m = d.number.match(/-(\d+)$/);
+            if (m) store.set('vv-counter', Math.max(store.get('vv-counter', 0), parseInt(m[1], 10)));
+
+            store.set('vv-issuer', readIssuer());
+            $('save-msg').classList.remove('hidden');
+            setTimeout(() => $('save-msg').classList.add('hidden'), 2500);
+        }
+
+        function openList() {
+            const list = store.get('vv-devis', []);
+            const body = $('list-body');
+            body.innerHTML = list.length ? '' : '<p class="text-sm opacity-60">Aucun devis enregistré sur cet appareil.</p>';
+            list.forEach((d) => {
+                const total = d.lines.reduce((acc, l) => acc + l.qty * l.price, 0);
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between gap-3 p-3 rounded-xl border border-brand-plum/10';
+                row.innerHTML = `
+                    <div class="min-w-0">
+                        <p class="font-bold text-sm truncate">${escapeHtml(d.number)} · ${escapeHtml(d.client.name || 'Sans nom')}</p>
+                        <p class="text-xs opacity-60 truncate">${fmtDate(d.date)} · ${escapeHtml(d.object)} · ${eur(total)}</p>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <button class="o-open text-xs font-bold px-3 py-1.5 rounded-full bg-brand-plum text-brand-cream">Ouvrir</button>
+                        <button class="o-del text-xs font-bold px-3 py-1.5 rounded-full text-red-800 hover:bg-red-50">Supprimer</button>
+                    </div>`;
+                row.querySelector('.o-open').addEventListener('click', () => {
+                    const { savedAt, ...rest } = d;
+                    draft = rest;
+                    fillForm(draft);
+                    render();
+                    $('list-modal').classList.add('hidden');
+                });
+                row.querySelector('.o-del').addEventListener('click', () => {
+                    if (!confirm(`Supprimer le devis ${d.number} ?`)) return;
+                    store.set('vv-devis', store.get('vv-devis', []).filter((x) => x.number !== d.number));
+                    openList();
+                });
+                body.appendChild(row);
+            });
+            $('list-modal').classList.remove('hidden');
+        }
+
+        // ----- Événements -----
+        $('btn-add-line').addEventListener('click', () => { $('lines').appendChild(lineRow({ qty: 1, unit: 'unité', price: 0 })); syncFromForm(); });
+        $('btn-new').addEventListener('click', () => { if (confirm('Créer un nouveau devis ? Le brouillon actuel sera perdu s\'il n\'est pas enregistré.')) newDraft(); });
+        $('btn-save').addEventListener('click', saveDraft);
+        $('btn-print').addEventListener('click', () => { syncFromForm(); window.print(); });
+        $('btn-list').addEventListener('click', openList);
+        $('list-close').addEventListener('click', () => $('list-modal').classList.add('hidden'));
+
+        // Champs simples : aperçu en direct
+        ['f-number', 'f-date', 'f-validity', 'f-deposit', 'f-object', 'c-name', 'c-address', 'c-email', 'c-phone', 'c-siret', 'f-notes', 'i-name', 'i-brand', 'i-address', 'i-email', 'i-phone', 'i-siret']
+            .forEach((id) => $(id).addEventListener('input', syncFromForm));
+        document.querySelectorAll('input[name="c-type"], #f-micro').forEach((el) => el.addEventListener('change', syncFromForm));
+
+        // ----- Démarrage -----
+        if (sessionStorage.getItem('vv-admin') === '1') showApp();
+    </script>
+</body>
+</html>
