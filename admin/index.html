@@ -2,14 +2,16 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#4a1531">
     <title>Administration | Velours & Vapeur</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -24,54 +26,59 @@
         }
     </script>
     <style>
+        html { -webkit-tap-highlight-color: transparent; }
+        body { -webkit-font-smoothing: antialiased; }
+        .label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(74, 21, 49, .7); margin-bottom: .35rem; }
+        input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea, select {
+            width: 100%;
+            padding: .65rem .8rem;
+            background: #fcfaf8;
+            border: 1px solid rgba(74, 21, 49, .14);
+            border-radius: .75rem;
+            font-size: .9rem;
+            color: #4a1531;
+            min-height: 44px;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #4a1531; box-shadow: 0 0 0 1px #4a1531; }
+        .card { background: #fff; border: 1px solid rgba(74, 21, 49, .08); border-radius: 1.1rem; box-shadow: 0 16px 40px -28px rgba(74, 21, 49, .35); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 44px; padding: .7rem 1.1rem; border-radius: 999px; font-size: .8rem; font-weight: 700; transition: background-color .2s, transform .15s; }
+        .btn:active { transform: scale(.97); }
+        .btn-primary { background: #4a1531; color: #fcfaf8; }
+        .btn-primary:hover { background: #73234d; }
+        .btn-ghost { background: #fff; border: 1px solid rgba(74, 21, 49, .2); color: #4a1531; }
+        .btn-ghost:hover { background: #f0e8df; }
+        .btn-danger { color: #991b1b; }
+        .chip { min-height: 38px; padding: .45rem .9rem; border-radius: 999px; font-size: .78rem; font-weight: 700; border: 1px solid rgba(74, 21, 49, .15); background: #fff; white-space: nowrap; }
+        .chip.active { background: #4a1531; color: #fcfaf8; border-color: #4a1531; }
+        .tab-btn { font-size: 12px; font-weight: 700; padding: .55rem 1rem; border-radius: 999px; color: rgba(252, 250, 248, .75); }
+        .tab-btn.active { background: #fcfaf8; color: #4a1531; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { scrollbar-width: none; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; flex: 1; min-height: 60px; font-size: 10.5px; font-weight: 700; color: rgba(74, 21, 49, .55); }
+        .nav-item.active { color: #4a1531; }
+        .nav-item.active .nav-ico { background: #f0e8df; }
+        .nav-ico { width: 46px; height: 30px; border-radius: 999px; display: grid; place-items: center; transition: background-color .2s; }
+        .nav-ico svg { width: 22px; height: 22px; }
+        .nav-fab { width: 56px; height: 56px; margin-top: -22px; border-radius: 999px; background: #4a1531; color: #fcfaf8; display: grid; place-items: center; box-shadow: 0 10px 24px -8px rgba(74,21,49,.6); border: 4px solid #fcfaf8; }
+        .nav-fab svg { width: 26px; height: 26px; }
+        .nav-fab.active { background: #73234d; }
+        .status-pill { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: .3rem .6rem; border-radius: 999px; white-space: nowrap; }
         .doc-page { width: 210mm; max-width: 100%; min-height: 297mm; display: flex; flex-direction: column; }
         .doc-page > .doc-footer { margin-top: auto; }
         .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { scrollbar-width: none; }
-
-        /* Fenêtre de confirmation */
+        #pdf-stage { position: fixed; left: -10000px; top: 0; width: 210mm; background: #fff; }
+        #pdf-stage .doc-page { height: 296mm; min-height: 0; overflow: hidden; }
         .modal-enter { animation: modalIn .25s cubic-bezier(.22,.8,.24,1) both; }
         @keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+        .fade-in { animation: fadeIn .35s ease both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .editor-actions { display: grid; grid-template-columns: 1fr auto; gap: .5rem; }
 
-        /* Mobile */
-        @media (max-width: 640px) {
-            input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea, select { font-size: 16px; padding: .75rem; }
-            .doc-page { width: 100%; min-height: 0; border-radius: 0; }
-            .doc-page .doc-body { padding-left: 1.25rem; padding-right: 1.25rem; }
-            .doc-page .doc-head { padding-left: 1.25rem; padding-right: 1.25rem; }
-            .editor-bottom-pad { padding-bottom: 6rem; }
-        }
-        input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea, select {
-            width: 100%;
-            padding: .6rem .75rem;
-            background: #fcfaf8;
-            border: 1px solid rgba(74, 21, 49, .12);
-            border-radius: .75rem;
-            font-size: .875rem;
-            color: #4a1531;
-        }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: #4a1531; box-shadow: 0 0 0 1px #4a1531; }
-        .label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(74, 21, 49, .7); margin-bottom: .35rem; }
-        .tab-btn { font-size: 12px; font-weight: 700; padding: .55rem 1rem; border-radius: 999px; color: rgba(252, 250, 248, .75); }
-        .tab-btn.active { background: #fcfaf8; color: #4a1531; }
-        .card { background: #fff; border: 1px solid rgba(74, 21, 49, .06); border-radius: 1rem; box-shadow: 0 20px 50px -28px rgba(74, 21, 49, .28); }
-        @media print {
-            @page { size: A4; margin: 8mm; }
-            html, body { background: #fff !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
-            .no-print { display: none !important; }
-            .print-area, .print-area > div, .print-area .overflow-auto { padding: 0 !important; margin: 0 !important; overflow: visible !important; }
-            /* Une seule page A4 : hauteur fixe, pas de débordement vers une page vierge */
-            .doc-page {
-                box-shadow: none !important; border: 0 !important;
-                width: 194mm !important; height: 281mm !important; min-height: 0 !important; max-height: 281mm !important;
-                overflow: hidden !important; margin: 0 auto !important;
-                font-size: 10.5px !important; page-break-inside: avoid !important; break-inside: avoid !important;
-            }
-            .doc-page table { page-break-inside: avoid; }
-            .doc-page .doc-footer { margin-top: auto !important; }
-            .table-wrap { overflow: visible !important; }
-            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        @media (max-width: 767px) {
+            .page-pad { padding-bottom: 7.5rem; }
+            .editor-actions-mobile { position: fixed; left: 0; right: 0; bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 35; background: rgba(252,250,248,.97); backdrop-filter: blur(8px); border-top: 1px solid rgba(74,21,49,.1); padding: .75rem 1rem; }
+            .doc-page { width: 100%; min-height: 0; }
+            .doc-page .doc-head, .doc-page .doc-body { padding-left: 1.25rem; padding-right: 1.25rem; }
         }
     </style>
 </head>
@@ -80,7 +87,7 @@
 
     <!-- CONNEXION -->
     <div id="login" class="hidden min-h-screen flex items-center justify-center p-4">
-        <form id="login-form" class="w-full max-w-sm bg-white rounded-[24px] shadow-soft border border-brand-plum/5 p-8 space-y-5">
+        <form id="login-form" class="w-full max-w-sm bg-white rounded-[24px] shadow-soft border border-brand-plum/5 p-6 sm:p-8 space-y-5">
             <div class="text-center space-y-3">
                 <img src="../images/logo.png" alt="Velours & Vapeur" class="h-10 mx-auto bg-brand-plum rounded-xl px-3 py-2">
                 <h1 class="text-xl font-black">Espace administration</h1>
@@ -93,217 +100,238 @@
                 <label class="label" for="l-pwd">Mot de passe</label>
                 <input type="password" id="l-pwd" autocomplete="current-password" required>
             </div>
-            <p id="login-error" class="hidden text-xs font-bold text-red-700"></p>
-            <button type="submit" class="w-full bg-brand-plum text-brand-cream py-3.5 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight transition-colors">Se connecter</button>
+            <p id="login-error" class="hidden text-sm font-bold text-red-800"></p>
+            <button type="submit" class="btn btn-primary w-full uppercase tracking-wider">Se connecter</button>
         </form>
     </div>
 
     <!-- APPLICATION -->
     <div id="app" class="hidden">
-        <header class="no-print sticky top-0 z-30 bg-brand-plum text-brand-cream">
-            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <img src="../images/logo.png" alt="Velours & Vapeur" class="h-8 w-auto">
-                    <span class="hidden md:inline text-xs font-bold uppercase tracking-widest opacity-70">Administration</span>
+
+        <!-- En-tête -->
+        <header class="sticky top-0 z-30 bg-brand-plum text-brand-cream">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <img src="../images/logo.png" alt="Velours & Vapeur" class="h-8 w-auto shrink-0">
+                    <span id="mobile-title" class="md:hidden text-sm font-black truncate">Tableau de bord</span>
                 </div>
-                <nav class="flex items-center gap-1 overflow-x-auto no-scrollbar min-w-0 -mx-1 px-1">
+                <nav class="hidden md:flex items-center gap-1" aria-label="Navigation">
                     <button class="tab-btn" data-tab="dashboard">Tableau de bord</button>
                     <button class="tab-btn" data-tab="clients">Clients</button>
                     <button class="tab-btn" data-tab="documents">Devis &amp; factures</button>
                     <button class="tab-btn" data-tab="editor">Nouveau</button>
                     <button class="tab-btn" data-tab="settings">Paramètres</button>
                 </nav>
-                <button id="btn-logout" class="text-xs font-bold px-3 py-2 opacity-70 hover:opacity-100 shrink-0">Quitter</button>
+                <button id="btn-logout" class="btn btn-ghost !bg-transparent !border-white/25 !text-brand-cream !min-h-[38px] !px-3 !text-xs shrink-0">Quitter</button>
             </div>
         </header>
 
-        <div id="toast" class="no-print hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full bg-brand-plumDark text-brand-cream text-xs font-bold shadow-soft"></div>
+        <main class="page-pad max-w-[1400px] mx-auto p-4 sm:p-6">
 
-        <!-- TABLEAU DE BORD -->
-        <section id="tab-dashboard" class="no-print max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="card p-5"><p class="label">Encaissé</p><p id="k-paid" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures payées</p></div>
-                <div class="card p-5"><p class="label">En attente</p><p id="k-pending" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures envoyées, non payées</p></div>
-                <div class="card p-5"><p class="label">Devis en cours</p><p id="k-quotes" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Brouillons et devis envoyés</p></div>
-                <div class="card p-5"><p class="label">Clients</p><p id="k-clients" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Enregistrés</p></div>
-            </div>
-            <div class="card p-5">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-black uppercase tracking-wider">Derniers documents</h2>
-                    <button class="text-xs font-bold underline" data-goto="documents">Voir tout</button>
+            <!-- TABLEAU DE BORD -->
+            <section id="tab-dashboard" class="space-y-6 fade-in">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black">Bonjour 👋</h2>
+                    <p class="text-sm opacity-65">Voici l'état de votre activité.</p>
                 </div>
-                <div id="recent-docs" class="space-y-2"></div>
-            </div>
-        </section>
-
-        <!-- CLIENTS -->
-        <section id="tab-clients" class="no-print hidden max-w-[1400px] mx-auto p-4 sm:p-6">
-            <div class="card overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-brand-plum text-brand-cream text-xs">
-                        <tr>
-                            <th class="text-left p-3 font-bold">Client</th>
-                            <th class="text-left p-3 font-bold hidden md:table-cell">Type</th>
-                            <th class="text-right p-3 font-bold hidden sm:table-cell">Devis</th>
-                            <th class="text-right p-3 font-bold hidden sm:table-cell">Factures</th>
-                            <th class="text-right p-3 font-bold">Facturé</th>
-                            <th class="text-right p-3 font-bold">Encaissé</th>
-                            <th class="text-right p-3 font-bold">Reste dû</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clients-body"></tbody>
-                </table>
-            </div>
-            <p class="text-[11px] opacity-60 mt-3">Cliquez sur un client pour voir ses devis et factures.</p>
-        </section>
-
-        <!-- DOCUMENTS -->
-        <section id="tab-documents" class="no-print hidden max-w-[1400px] mx-auto p-4 sm:p-6 space-y-4">
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input type="text" id="d-search" placeholder="Rechercher (client, numéro, objet)" class="sm:max-w-sm">
-                <select id="d-kind" class="sm:max-w-[180px]">
-                    <option value="">Devis et factures</option>
-                    <option value="devis">Devis</option>
-                    <option value="facture">Factures</option>
-                </select>
-                <select id="d-status" class="sm:max-w-[180px]">
-                    <option value="">Tous les statuts</option>
-                    <option value="brouillon">Brouillon</option>
-                    <option value="envoye">Envoyé</option>
-                    <option value="accepte">Accepté</option>
-                    <option value="paye">Payé</option>
-                    <option value="annule">Annulé</option>
-                </select>
-            </div>
-            <div class="card overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-brand-plum text-brand-cream text-xs">
-                        <tr>
-                            <th class="text-left p-3 font-bold">Numéro</th>
-                            <th class="text-left p-3 font-bold">Client</th>
-                            <th class="text-left p-3 font-bold hidden md:table-cell">Date</th>
-                            <th class="text-right p-3 font-bold">Montant TTC</th>
-                            <th class="text-left p-3 font-bold">Statut</th>
-                            <th class="p-3"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="docs-body"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ÉDITEUR -->
-        <div id="tab-editor" class="hidden max-w-[1400px] mx-auto p-4 sm:p-6 editor-bottom-pad grid grid-cols-1 xl:grid-cols-[460px_1fr] gap-6">
-            <aside class="no-print space-y-5">
-                <section class="card p-5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-black uppercase tracking-wider" id="e-title">Nouveau document</h2>
-                        <span id="e-state" class="text-[10px] font-bold uppercase tracking-wider opacity-50">Brouillon</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="label" for="e-kind">Type</label>
-                            <select id="e-kind"><option value="devis">Devis</option><option value="facture">Facture</option></select></div>
-                        <div><label class="label" for="e-status">Statut</label>
-                            <select id="e-status">
-                                <option value="brouillon">Brouillon</option>
-                                <option value="envoye">Envoyé</option>
-                                <option value="accepte">Accepté</option>
-                                <option value="paye">Payé</option>
-                                <option value="annule">Annulé</option>
-                            </select></div>
-                        <div><label class="label" for="e-number">Numéro</label><input type="text" id="e-number" placeholder="Automatique"></div>
-                        <div><label class="label" for="e-date">Date</label><input type="date" id="e-date"></div>
-                        <div><label class="label" for="e-validity">Validité (jours)</label><input type="number" id="e-validity" min="1"></div>
-                        <div><label class="label" for="e-deposit">Acompte (%)</label><input type="number" id="e-deposit" min="0" max="100"></div>
-                    </div>
-                    <div><label class="label" for="e-object">Objet de la prestation</label><input type="text" id="e-object" placeholder="Ex: Nettoyage canapé et matelas"></div>
-                </section>
-
-                <section class="card p-5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-black uppercase tracking-wider">Client</h2>
-                        <button id="btn-new-client" class="text-xs font-bold underline">Nouveau client</button>
-                    </div>
-                    <div><label class="label" for="e-client">Choisir un client</label>
-                        <select id="e-client"><option value="">— Nouveau client —</option></select></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 text-xs font-bold p-2.5 rounded-xl border border-brand-plum/10 cursor-pointer"><input type="radio" name="c-type" value="Particulier" class="accent-brand-plum"> Particulier</label>
-                        <label class="flex items-center gap-2 text-xs font-bold p-2.5 rounded-xl border border-brand-plum/10 cursor-pointer"><input type="radio" name="c-type" value="Professionnel" class="accent-brand-plum"> Professionnel</label>
-                    </div>
-                    <div><label class="label" for="c-name">Nom / Entreprise</label><input type="text" id="c-name"></div>
-                    <div><label class="label" for="c-address">Adresse</label><textarea id="c-address" rows="2"></textarea></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="label" for="c-email">Email</label><input type="email" id="c-email"></div>
-                        <div><label class="label" for="c-phone">Téléphone</label><input type="tel" id="c-phone"></div>
-                    </div>
-                    <div><label class="label" for="c-siret">SIRET (si professionnel)</label><input type="text" id="c-siret"></div>
-                </section>
-
-                <section class="card p-5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-black uppercase tracking-wider">Prestations</h2>
-                        <button id="btn-add-line" class="text-xs font-bold px-3 py-1.5 rounded-full bg-brand-plum text-brand-cream">+ Ligne</button>
-                    </div>
-                    <div id="lines" class="space-y-3"></div>
-                    <div class="flex items-center gap-2 text-xs font-medium pt-2 border-t border-brand-plum/10">
-                        <input type="checkbox" id="e-micro" class="accent-brand-plum w-4 h-4">
-                        <label for="e-micro">Micro-entreprise : TVA non applicable, art. 293 B du CGI</label>
-                    </div>
-                </section>
-
-                <section class="card p-5 space-y-3">
-                    <h2 class="text-sm font-black uppercase tracking-wider">Notes</h2>
-                    <textarea id="e-notes" rows="3" placeholder="Informations affichées sur le document"></textarea>
-                </section>
-
-                <div class="grid grid-cols-2 gap-2 fixed bottom-0 inset-x-0 z-30 bg-brand-cream/95 backdrop-blur p-3 border-t border-brand-plum/10 xl:static xl:bg-transparent xl:p-0 xl:border-0">
-                    <button id="btn-save" class="col-span-2 bg-brand-plum text-brand-cream py-3.5 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight">Enregistrer</button>
-                    <button id="btn-convert" class="hidden bg-white border border-brand-plum/20 py-3 rounded-full font-bold text-xs hover:bg-brand-beige">Créer la facture</button>
-                    <button id="btn-print" class="bg-white border border-brand-plum/20 py-3 rounded-full font-bold text-xs hover:bg-brand-beige">Imprimer / PDF</button>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="card p-4 sm:p-5 border-l-4 border-l-emerald-600"><p class="label">Encaissé</p><p id="k-paid" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures payées</p></div>
+                    <div class="card p-4 sm:p-5 border-l-4 border-l-amber-500"><p class="label">En attente</p><p id="k-pending" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures non payées</p></div>
+                    <div class="card p-4 sm:p-5 border-l-4 border-l-sky-600"><p class="label">Devis en cours</p><p id="k-quotes" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Brouillons et envoyés</p></div>
+                    <div class="card p-4 sm:p-5 border-l-4 border-l-brand-plum"><p class="label">Clients</p><p id="k-clients" class="text-xl sm:text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Enregistrés</p></div>
                 </div>
-            </aside>
-
-            <main class="print-area min-w-0">
-                <div class="no-print mb-3 text-xs font-bold uppercase tracking-wider opacity-60">Aperçu</div>
-                <div class="overflow-auto">
-                    <article id="doc" class="doc-page mx-auto bg-white shadow-soft border border-brand-plum/5 text-[12px] text-brand-plum"></article>
+                <div class="flex gap-2">
+                    <button class="btn btn-primary flex-1 sm:flex-none" data-goto-new>+ Nouveau devis</button>
+                    <button class="btn btn-ghost flex-1 sm:flex-none" data-tab-go="documents">Tous les documents</button>
                 </div>
-            </main>
-        </div>
-
-        <!-- PARAMÈTRES -->
-        <section id="tab-settings" class="no-print hidden max-w-2xl mx-auto p-4 sm:p-6">
-            <form id="settings-form" class="card p-6 space-y-4">
-                <h2 class="text-sm font-black uppercase tracking-wider">Mes coordonnées</h2>
-                <div><label class="label" for="i-name">Nom</label><input type="text" id="i-name"></div>
-                <div><label class="label" for="i-brand">Enseigne</label><input type="text" id="i-brand"></div>
-                <div><label class="label" for="i-address">Adresse</label><textarea id="i-address" rows="2"></textarea></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="label" for="i-email">Email</label><input type="email" id="i-email"></div>
-                    <div><label class="label" for="i-phone">Téléphone</label><input type="tel" id="i-phone"></div>
+                <div>
+                    <h3 class="text-xs font-black uppercase tracking-wider opacity-70 mb-3">Derniers documents</h3>
+                    <div id="recent-docs" class="space-y-3"></div>
                 </div>
-                <div><label class="label" for="i-siret">SIRET</label><input type="text" id="i-siret"></div>
-                <button type="submit" class="bg-brand-plum text-brand-cream px-6 py-3 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight">Enregistrer</button>
-            </form>
-        </section>
+            </section>
+
+            <!-- CLIENTS -->
+            <section id="tab-clients" class="hidden space-y-5 fade-in">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black">Clients</h2>
+                    <p class="text-sm opacity-65">Touchez un client pour voir ses devis et factures.</p>
+                </div>
+                <div id="clients-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4"></div>
+            </section>
+
+            <!-- DOCUMENTS -->
+            <section id="tab-documents" class="hidden space-y-4 fade-in">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black">Devis &amp; factures</h2>
+                    <div id="client-filter-banner" class="hidden mt-2 flex items-center justify-between gap-2 text-sm font-bold bg-brand-beige rounded-xl px-3 py-2">
+                        <span id="client-filter-name"></span>
+                        <button id="client-filter-clear" class="text-xs underline">Tout afficher</button>
+                    </div>
+                </div>
+                <input type="text" id="d-search" placeholder="Rechercher un client, un numéro, un objet…">
+                <div class="no-scrollbar flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0" id="kind-chips">
+                    <button class="chip active" data-kind="">Tous</button>
+                    <button class="chip" data-kind="devis">Devis</button>
+                    <button class="chip" data-kind="facture">Factures</button>
+                </div>
+                <div class="no-scrollbar flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0" id="status-chips">
+                    <button class="chip active" data-status="">Tous statuts</button>
+                    <button class="chip" data-status="brouillon">Brouillon</button>
+                    <button class="chip" data-status="envoye">Envoyé</button>
+                    <button class="chip" data-status="accepte">Accepté</button>
+                    <button class="chip" data-status="paye">Payé</button>
+                    <button class="chip" data-status="annule">Annulé</button>
+                </div>
+                <p id="docs-count" class="text-xs font-bold opacity-60"></p>
+                <div id="docs-list" class="space-y-3"></div>
+            </section>
+
+            <!-- ÉDITEUR -->
+            <section id="tab-editor" class="hidden fade-in">
+                <div class="grid grid-cols-1 xl:grid-cols-[460px_1fr] gap-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 id="e-title" class="text-xl font-black">Nouveau devis</h2>
+                                <span id="e-state" class="text-xs font-bold opacity-60">Non enregistré</span>
+                            </div>
+                            <button id="btn-reset" class="btn btn-ghost !min-h-[38px] !text-xs">Vider</button>
+                        </div>
+
+                        <div class="card p-4 sm:p-5 space-y-4">
+                            <h3 class="text-xs font-black uppercase tracking-wider opacity-70">Document</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="label" for="e-kind">Type</label>
+                                    <select id="e-kind"><option value="devis">Devis</option><option value="facture">Facture</option></select></div>
+                                <div><label class="label" for="e-status">Statut</label>
+                                    <select id="e-status">
+                                        <option value="brouillon">Brouillon</option>
+                                        <option value="envoye">Envoyé</option>
+                                        <option value="accepte">Accepté</option>
+                                        <option value="paye">Payé</option>
+                                        <option value="annule">Annulé</option>
+                                    </select></div>
+                                <div><label class="label" for="e-number">Numéro</label><input type="text" id="e-number" placeholder="Automatique"></div>
+                                <div><label class="label" for="e-date">Date</label><input type="date" id="e-date"></div>
+                                <div><label class="label" for="e-validity">Validité (jours)</label><input type="number" id="e-validity" min="1" inputmode="numeric"></div>
+                                <div><label class="label" for="e-deposit">Acompte (%)</label><input type="number" id="e-deposit" min="0" max="100" inputmode="decimal"></div>
+                            </div>
+                            <div><label class="label" for="e-object">Objet de la prestation</label><input type="text" id="e-object" placeholder="Ex : Nettoyage canapé et matelas"></div>
+                        </div>
+
+                        <div class="card p-4 sm:p-5 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-black uppercase tracking-wider opacity-70">Client</h3>
+                                <button id="btn-new-client" class="text-xs font-bold underline">Nouveau client</button>
+                            </div>
+                            <div><label class="label" for="e-client">Choisir un client</label>
+                                <select id="e-client"><option value="">— Nouveau client —</option></select></div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center justify-center gap-2 min-h-[44px] text-sm font-bold rounded-xl border border-brand-plum/15 cursor-pointer has-[:checked]:bg-brand-plum has-[:checked]:text-brand-cream"><input type="radio" name="c-type" value="Particulier" class="accent-brand-plum"> Particulier</label>
+                                <label class="flex items-center justify-center gap-2 min-h-[44px] text-sm font-bold rounded-xl border border-brand-plum/15 cursor-pointer has-[:checked]:bg-brand-plum has-[:checked]:text-brand-cream"><input type="radio" name="c-type" value="Professionnel" class="accent-brand-plum"> Professionnel</label>
+                            </div>
+                            <div><label class="label" for="c-name">Nom / Entreprise</label><input type="text" id="c-name" autocomplete="off"></div>
+                            <div><label class="label" for="c-address">Adresse</label><textarea id="c-address" rows="2"></textarea></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div><label class="label" for="c-email">Email</label><input type="email" id="c-email" inputmode="email"></div>
+                                <div><label class="label" for="c-phone">Téléphone</label><input type="tel" id="c-phone" inputmode="tel"></div>
+                            </div>
+                            <div><label class="label" for="c-siret">SIRET (si professionnel)</label><input type="text" id="c-siret" inputmode="numeric"></div>
+                        </div>
+
+                        <div class="card p-4 sm:p-5 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-black uppercase tracking-wider opacity-70">Prestations</h3>
+                                <button id="btn-add-line" class="btn btn-primary !min-h-[38px] !py-2 !text-xs">+ Ajouter</button>
+                            </div>
+                            <div id="lines" class="space-y-3"></div>
+                            <label class="flex items-center gap-3 text-sm font-medium pt-3 border-t border-brand-plum/10 min-h-[44px]">
+                                <input type="checkbox" id="e-micro" class="accent-brand-plum w-5 h-5">
+                                <span>Micro-entreprise : TVA non applicable, art. 293 B du CGI</span>
+                            </label>
+                        </div>
+
+                        <div class="card p-4 sm:p-5 space-y-3">
+                            <h3 class="text-xs font-black uppercase tracking-wider opacity-70">Notes</h3>
+                            <textarea id="e-notes" rows="3" placeholder="Informations affichées sur le document"></textarea>
+                        </div>
+
+                        <!-- Actions : barre fixe au-dessus de la navigation sur mobile -->
+                        <div id="editor-actions" class="flex gap-2 items-center editor-actions-mobile xl:static xl:bg-transparent xl:border-0 xl:p-0">
+                            <button id="btn-save" class="btn btn-primary flex-1 uppercase tracking-wider">Enregistrer</button>
+                            <button id="btn-pdf" class="btn btn-ghost">PDF</button>
+                            <button id="btn-convert" class="hidden btn btn-ghost">Facture</button>
+                        </div>
+                    </div>
+
+                    <!-- Aperçu : replié sur mobile -->
+                    <details id="preview-wrap" class="min-w-0 group">
+                        <summary class="xl:hidden card px-4 py-3 flex items-center justify-between cursor-pointer list-none font-bold text-sm">
+                            <span>Voir l'aperçu du document</span>
+                            <span class="group-open:rotate-180 transition-transform">▾</span>
+                        </summary>
+                        <div class="mt-3 xl:mt-0">
+                            <div class="overflow-auto no-scrollbar">
+                                <article id="doc" class="doc-page mx-auto bg-white shadow-soft border border-brand-plum/5 text-[12px] text-brand-plum"></article>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- PARAMÈTRES -->
+            <section id="tab-settings" class="hidden max-w-2xl mx-auto fade-in">
+                <h2 class="text-xl sm:text-2xl font-black mb-4">Paramètres</h2>
+                <form id="settings-form" class="card p-5 sm:p-6 space-y-4">
+                    <h3 class="text-xs font-black uppercase tracking-wider opacity-70">Mes coordonnées</h3>
+                    <p class="text-xs opacity-60 -mt-2">Elles apparaissent sur chaque devis et facture.</p>
+                    <div><label class="label" for="i-name">Nom</label><input type="text" id="i-name"></div>
+                    <div><label class="label" for="i-brand">Enseigne</label><input type="text" id="i-brand"></div>
+                    <div><label class="label" for="i-address">Adresse</label><textarea id="i-address" rows="2"></textarea></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div><label class="label" for="i-email">Email</label><input type="email" id="i-email"></div>
+                        <div><label class="label" for="i-phone">Téléphone</label><input type="tel" id="i-phone"></div>
+                    </div>
+                    <div><label class="label" for="i-siret">SIRET</label><input type="text" id="i-siret"></div>
+                    <button type="submit" class="btn btn-primary w-full sm:w-auto">Enregistrer</button>
+                </form>
+                <button id="btn-logout-2" class="btn btn-ghost w-full mt-4 btn-danger">Se déconnecter</button>
+            </section>
+        </main>
+
+        <!-- Navigation mobile (bas d'écran) -->
+        <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-brand-plum/10 shadow-[0_-10px_30px_-14px_rgba(74,21,49,.35)] pb-[env(safe-area-inset-bottom)]" aria-label="Navigation mobile">
+            <div class="flex items-end justify-around px-2">
+                <button class="nav-item" data-tab="dashboard"><span class="nav-ico" data-ico="home"></span>Accueil</button>
+                <button class="nav-item" data-tab="clients"><span class="nav-ico" data-ico="users"></span>Clients</button>
+                <button class="nav-item" data-tab="editor" data-fab><span class="nav-fab" data-ico="plus"></span>Nouveau</button>
+                <button class="nav-item" data-tab="documents"><span class="nav-ico" data-ico="file"></span>Documents</button>
+                <button class="nav-item" data-tab="settings"><span class="nav-ico" data-ico="settings"></span>Réglages</button>
+            </div>
+        </nav>
+
+        <div id="toast" class="hidden fixed top-[calc(4.5rem+env(safe-area-inset-top))] md:top-5 md:bottom-auto left-1/2 -translate-x-1/2 z-[70] px-5 py-3 rounded-full bg-brand-plumDark text-brand-cream text-sm font-bold shadow-soft whitespace-nowrap"></div>
     </div>
 
-    <!-- FENÊTRE DE CONFIRMATION -->
-    <div id="modal" class="no-print hidden fixed inset-0 z-[60] bg-brand-plumDark/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal-enter bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-soft space-y-4">
+    <!-- Confirmation -->
+    <div id="modal" class="hidden fixed inset-0 z-[60] bg-brand-plumDark/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-enter bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-soft space-y-4">
             <div class="flex items-start gap-3">
-                <span id="modal-icon" class="shrink-0 w-10 h-10 rounded-full bg-brand-beige text-brand-plum grid place-items-center font-black">!</span>
+                <span id="modal-icon" class="shrink-0 w-10 h-10 rounded-full bg-brand-beige text-brand-plum grid place-items-center font-black">?</span>
                 <div class="min-w-0">
                     <h3 id="modal-title" class="font-black text-base"></h3>
                     <p id="modal-text" class="text-sm opacity-75 mt-1"></p>
                 </div>
             </div>
             <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
-                <button id="modal-cancel" type="button" class="w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold border border-brand-plum/20 hover:bg-brand-beige">Annuler</button>
-                <button id="modal-ok" type="button" class="w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold bg-brand-plum text-brand-cream hover:bg-brand-plumLight">Confirmer</button>
+                <button id="modal-cancel" type="button" class="btn btn-ghost w-full sm:w-auto">Annuler</button>
+                <button id="modal-ok" type="button" class="btn btn-primary w-full sm:w-auto">Confirmer</button>
             </div>
         </div>
     </div>
+
+    <!-- Zone hors écran utilisée pour générer le PDF (une seule page A4) -->
+    <div id="pdf-stage" aria-hidden="true"></div>
 
     <script>
         // ===================== CONFIGURATION =====================
@@ -323,9 +351,11 @@
         // ===================== ÉTAT =====================
         let settings = { issuer: DEFAULT_ISSUER };
         let clients = [];
-        let documents = [];        // avec lignes et client joint
-        let current = null;        // document ouvert dans l'éditeur (null = nouveau)
+        let documents = [];
+        let current = null;
         let currentClientId = null;
+        let clientFilter = null;
+        let activeTab = 'dashboard';
 
         // ===================== OUTILS =====================
         const $ = (id) => document.getElementById(id);
@@ -335,6 +365,7 @@
         const today = () => new Date().toISOString().slice(0, 10);
         function esc(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
         function nl2br(s) { return esc(s).replace(/\n/g, '<br>'); }
+
         function toast(msg, isError = false) {
             const t = $('toast');
             t.textContent = msg;
@@ -343,15 +374,15 @@
             clearTimeout(toast._t);
             toast._t = setTimeout(() => t.classList.add('hidden'), 3000);
         }
-        // Fenêtre de confirmation personnalisée (remplace confirm() du navigateur)
+
+        // Fenêtre de confirmation
         function confirmModal({ title, text, okLabel = 'Confirmer', danger = false }) {
             return new Promise((resolve) => {
                 $('modal-title').textContent = title;
                 $('modal-text').textContent = text;
                 const ok = $('modal-ok');
                 ok.textContent = okLabel;
-                ok.className = 'w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold text-brand-cream ' +
-                    (danger ? 'bg-red-800 hover:bg-red-900' : 'bg-brand-plum hover:bg-brand-plumLight');
+                ok.className = 'btn w-full sm:w-auto ' + (danger ? 'bg-red-800 text-white hover:bg-red-900' : 'btn-primary');
                 $('modal-icon').textContent = danger ? '!' : '?';
                 $('modal').classList.remove('hidden');
                 ok.focus();
@@ -360,14 +391,11 @@
                     $('modal').classList.add('hidden');
                     ok.onclick = null;
                     $('modal-cancel').onclick = null;
-                    document.removeEventListener('keydown', onKey);
                     $('modal').onclick = null;
+                    document.removeEventListener('keydown', onKey);
                     resolve(result);
                 };
-                const onKey = (e) => {
-                    if (e.key === 'Escape') close(false);
-                    if (e.key === 'Enter' && document.activeElement === ok) close(true);
-                };
+                const onKey = (e) => { if (e.key === 'Escape') close(false); };
                 ok.onclick = () => close(true);
                 $('modal-cancel').onclick = () => close(false);
                 $('modal').onclick = (e) => { if (e.target === $('modal')) close(false); };
@@ -375,9 +403,18 @@
             });
         }
 
-        const STATUS = {
-            brouillon: 'Brouillon', envoye: 'Envoyé', accepte: 'Accepté', paye: 'Payé', annule: 'Annulé'
+        // Icônes (traits simples, sans bibliothèque)
+        const ICONS = {
+            home: '<path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/>',
+            users: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/><path d="M22 21a7 7 0 0 0-5-6.7"/>',
+            file: '<path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/>',
+            plus: '<path d="M12 5v14M5 12h14"/>',
+            settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'
         };
+        const svg = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+        document.querySelectorAll('[data-ico]').forEach((el) => { el.innerHTML = svg(el.dataset.ico); });
+
+        const STATUS = { brouillon: 'Brouillon', envoye: 'Envoyé', accepte: 'Accepté', paye: 'Payé', annule: 'Annulé' };
         const STATUS_STYLE = {
             brouillon: 'bg-brand-beige text-brand-plum',
             envoye: 'bg-amber-100 text-amber-900',
@@ -385,15 +422,15 @@
             paye: 'bg-emerald-100 text-emerald-900',
             annule: 'bg-red-100 text-red-900'
         };
-        const badge = (s) => `<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${STATUS_STYLE[s] || ''}">${STATUS[s] || s}</span>`;
+        const badge = (s) => `<span class="status-pill ${STATUS_STYLE[s] || ''}">${STATUS[s] || s}</span>`;
+        const kindLabel = (k) => k === 'devis' ? 'Devis' : 'Facture';
 
-        // Montants d'un document à partir de ses lignes
         function totalsOf(doc) {
             const ht = (doc.document_lines || []).reduce((acc, l) => acc + Number(l.quantity) * Number(l.unit_price), 0);
             const vat = doc.micro ? 0 : ht * 0.2;
-            const ttc = ht + vat;
-            return { ht, vat, ttc };
+            return { ht, vat, ttc: ht + vat };
         }
+        function clientName(doc) { return doc.client_name || doc.clients?.name || 'Sans nom'; }
 
         // ===================== CONNEXION =====================
         $('login-form').addEventListener('submit', async (e) => {
@@ -408,10 +445,12 @@
             await showApp();
         });
 
-        $('btn-logout').addEventListener('click', async () => {
+        async function logout() {
             await sb.auth.signOut();
             location.reload();
-        });
+        }
+        $('btn-logout').addEventListener('click', logout);
+        $('btn-logout-2').addEventListener('click', logout);
 
         async function showApp() {
             $('login').classList.add('hidden');
@@ -429,7 +468,8 @@
                 sb.from('documents').select('*, document_lines(*), clients(name, type)').order('created_at', { ascending: false })
             ]);
             if (s.error || c.error || d.error) {
-                toast('Erreur de chargement : ' + (s.error || c.error || d.error).message, true);
+                toast('Erreur de chargement', true);
+                console.error(s.error || c.error || d.error);
                 return;
             }
             settings = s.data;
@@ -437,10 +477,39 @@
             clients = c.data;
             documents = d.data.map((doc) => ({ ...doc, document_lines: (doc.document_lines || []).sort((a, b) => a.position - b.position) }));
             fillIssuerForm();
+            fillClientSelect();
             renderDashboard();
             renderClients();
             renderDocuments();
-            fillClientSelect();
+        }
+
+        // ===================== CARTE DOCUMENT =====================
+        function docCard(d, compact = false) {
+            const t = totalsOf(d);
+            return `
+                <article class="card p-4 active:bg-brand-beige/40" data-open="${d.id}">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-black uppercase tracking-wider opacity-55">${kindLabel(d.kind)} · ${esc(d.number)}</p>
+                            <p class="font-black text-base truncate">${esc(clientName(d))}</p>
+                            ${compact ? '' : `<p class="text-sm opacity-65 truncate">${esc(d.object) || '—'}</p>`}
+                        </div>
+                        <p class="font-black text-base whitespace-nowrap">${eur(t.ttc)}</p>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 mt-3">
+                        <div class="flex items-center gap-2 min-w-0">
+                            ${badge(d.status)}
+                            <span class="text-xs opacity-55 whitespace-nowrap">${fmtDate(d.issue_date)}</span>
+                        </div>
+                        ${compact ? '' : `
+                        <div class="flex items-center gap-1">
+                            <select data-status="${d.id}" class="!w-auto !min-h-[36px] !py-1 !px-2 !text-xs" aria-label="Changer le statut">
+                                ${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${k === d.status ? 'selected' : ''}>${v}</option>`).join('')}
+                            </select>
+                            <button data-delete="${d.id}" class="min-h-[36px] px-2 rounded-lg text-xs font-bold text-red-800 hover:bg-red-50">Supprimer</button>
+                        </div>`}
+                    </div>
+                </article>`;
         }
 
         // ===================== TABLEAU DE BORD =====================
@@ -454,41 +523,40 @@
             $('k-quotes').textContent = eur(sum(quotes));
             $('k-clients').textContent = clients.length;
 
-            $('recent-docs').innerHTML = documents.slice(0, 6).map((d) => `
-                <button data-open="${d.id}" class="w-full flex items-center justify-between gap-3 p-3 rounded-xl border border-brand-plum/10 hover:bg-brand-beige/40 text-left">
-                    <div class="min-w-0">
-                        <p class="font-bold text-sm truncate">${esc(d.number)} · ${esc(clientName(d))}</p>
-                        <p class="text-xs opacity-60">${fmtDate(d.issue_date)} · ${esc(d.object)}</p>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <p class="font-black text-sm">${eur(totalsOf(d).ttc)}</p>
-                        ${badge(d.status)}
-                    </div>
-                </button>`).join('') || '<p class="text-sm opacity-60">Aucun document pour le moment.</p>';
+            $('recent-docs').innerHTML = documents.slice(0, 5).map((d) => docCard(d, true)).join('')
+                || '<div class="card p-6 text-center text-sm opacity-60">Aucun document pour le moment.</div>';
         }
 
         // ===================== CLIENTS =====================
-        function clientName(doc) { return doc.client_name || doc.clients?.name || 'Sans nom'; }
-
         function renderClients() {
-            const rows = clients.map((c) => {
-                const docs = documents.filter((d) => d.client_id === c.id);
-                const quotes = docs.filter((d) => d.kind === 'devis' && d.status !== 'annule');
-                const invoices = docs.filter((d) => d.kind === 'facture' && d.status !== 'annule');
+            const html = clients.map((c) => {
+                const docs = documents.filter((d) => d.client_id === c.id && d.status !== 'annule');
+                const quotes = docs.filter((d) => d.kind === 'devis');
+                const invoices = docs.filter((d) => d.kind === 'facture');
                 const billed = invoices.reduce((acc, d) => acc + totalsOf(d).ttc, 0);
                 const paid = invoices.filter((d) => d.status === 'paye').reduce((acc, d) => acc + totalsOf(d).ttc, 0);
+                const due = billed - paid;
                 return `
-                    <tr class="border-t border-brand-plum/10 hover:bg-brand-beige/40 cursor-pointer" data-client="${c.id}">
-                        <td class="p-3 font-bold">${esc(c.name)}</td>
-                        <td class="p-3 hidden md:table-cell opacity-70">${esc(c.type)}</td>
-                        <td class="p-3 text-right hidden sm:table-cell">${quotes.length}</td>
-                        <td class="p-3 text-right hidden sm:table-cell">${invoices.length}</td>
-                        <td class="p-3 text-right whitespace-nowrap">${eur(billed)}</td>
-                        <td class="p-3 text-right text-emerald-800 font-bold whitespace-nowrap">${eur(paid)}</td>
-                        <td class="p-3 text-right whitespace-nowrap ${billed - paid > 0 ? 'text-amber-800 font-bold' : ''}">${eur(billed - paid)}</td>
-                    </tr>`;
+                    <button class="card p-4 text-left w-full active:bg-brand-beige/40 hover:shadow-lg transition-shadow" data-client="${c.id}">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="font-black text-base truncate">${esc(c.name)}</p>
+                                <p class="text-xs opacity-60">${esc(c.type)}${c.address ? ' · ' + esc(c.address.split('\n')[0]) : ''}</p>
+                            </div>
+                            ${due > 0 ? `<span class="status-pill bg-amber-100 text-amber-900 whitespace-nowrap">Reste dû</span>` : ''}
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+                            <div class="rounded-xl bg-brand-cream p-2.5"><p class="text-lg font-black">${quotes.length}</p><p class="text-[10px] font-bold uppercase opacity-60">Devis</p></div>
+                            <div class="rounded-xl bg-brand-cream p-2.5"><p class="text-lg font-black">${invoices.length}</p><p class="text-[10px] font-bold uppercase opacity-60">Factures</p></div>
+                            <div class="rounded-xl bg-brand-cream p-2.5"><p class="text-sm font-black text-emerald-800">${eur(paid)}</p><p class="text-[10px] font-bold uppercase opacity-60">Payé</p></div>
+                        </div>
+                        <div class="flex justify-between items-center mt-3 text-sm">
+                            <span class="opacity-65">Total facturé : <strong>${eur(billed)}</strong></span>
+                            <span class="font-black ${due > 0 ? 'text-amber-800' : 'opacity-50'}">${due > 0 ? 'Reste ' + eur(due) : 'Soldé'}</span>
+                        </div>
+                    </button>`;
             }).join('');
-            $('clients-body').innerHTML = rows || `<tr><td colspan="7" class="p-6 text-center opacity-60">Aucun client enregistré.</td></tr>`;
+            $('clients-list').innerHTML = html || '<div class="card p-6 text-center text-sm opacity-60 md:col-span-2 xl:col-span-3">Aucun client enregistré. Créez un devis pour ajouter votre premier client.</div>';
         }
 
         function fillClientSelect() {
@@ -500,40 +568,49 @@
         }
 
         // ===================== DOCUMENTS =====================
-        let clientFilter = null;
+        let kindFilter = '';
+        let statusFilter = '';
 
         function renderDocuments() {
             const q = $('d-search').value.trim().toLowerCase();
-            const kind = $('d-kind').value;
-            const status = $('d-status').value;
             const list = documents.filter((d) =>
-                (!kind || d.kind === kind) &&
-                (!status || d.status === status) &&
+                (!kindFilter || d.kind === kindFilter) &&
+                (!statusFilter || d.status === statusFilter) &&
                 (!clientFilter || d.client_id === clientFilter) &&
                 (!q || [d.number, clientName(d), d.object].some((v) => (v || '').toLowerCase().includes(q)))
             );
-            $('docs-body').innerHTML = list.map((d) => `
-                <tr class="border-t border-brand-plum/10 hover:bg-brand-beige/30">
-                    <td class="p-3 font-bold whitespace-nowrap">${esc(d.number)}<span class="block text-[10px] font-medium uppercase opacity-50">${d.kind === 'devis' ? 'Devis' : 'Facture'}</span></td>
-                    <td class="p-3">${esc(clientName(d))}<span class="block text-xs opacity-60 truncate max-w-[220px]">${esc(d.object)}</span></td>
-                    <td class="p-3 hidden md:table-cell whitespace-nowrap">${fmtDate(d.issue_date)}</td>
-                    <td class="p-3 text-right font-bold whitespace-nowrap">${eur(totalsOf(d).ttc)}</td>
-                    <td class="p-3"><select data-status="${d.id}" class="!w-auto !py-1.5 !text-xs">
-                        ${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${k === d.status ? 'selected' : ''}>${v}</option>`).join('')}
-                    </select></td>
-                    <td class="p-3 whitespace-nowrap text-right">
-                        <button data-open="${d.id}" class="text-xs font-bold px-3 py-1.5 rounded-full bg-brand-plum text-brand-cream">Ouvrir</button>
-                        <button data-delete="${d.id}" class="text-xs font-bold px-2 py-1.5 text-red-800">Supprimer</button>
-                    </td>
-                </tr>`).join('') || `<tr><td colspan="6" class="p-6 text-center opacity-60">Aucun document.</td></tr>`;
+            $('docs-count').textContent = `${list.length} document${list.length > 1 ? 's' : ''}`;
+            $('docs-list').innerHTML = list.map((d) => docCard(d)).join('') ||'<div class="card p-6 text-center text-sm opacity-60">Aucun document ne correspond.</div>';
+
+            const banner = $('client-filter-banner');
+            if (clientFilter) {
+                const c = clients.find((x) => x.id === clientFilter);
+                $('client-filter-name').textContent = 'Client : ' + (c ? c.name : '');
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
         }
 
         $('d-search').addEventListener('input', renderDocuments);
-        $('d-kind').addEventListener('change', renderDocuments);
-        $('d-status').addEventListener('change', renderDocuments);
+        $('kind-chips').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-kind]');
+            if (!b) return;
+            kindFilter = b.dataset.kind;
+            document.querySelectorAll('#kind-chips .chip').forEach((c) => c.classList.toggle('active', c === b));
+            renderDocuments();
+        });
+        $('status-chips').addEventListener('click', (e) => {
+            const b = e.target.closest('[data-status]');
+            if (!b) return;
+            statusFilter = b.dataset.status;
+            document.querySelectorAll('#status-chips .chip').forEach((c) => c.classList.toggle('active', c === b));
+            renderDocuments();
+        });
+        $('client-filter-clear').addEventListener('click', () => { clientFilter = null; renderDocuments(); });
 
-        // Changer le statut directement depuis la liste
-        $('docs-body').addEventListener('change', async (e) => {
+        // Changer le statut depuis la liste
+        document.addEventListener('change', async (e) => {
             const sel = e.target.closest('select[data-status]');
             if (!sel) return;
             const { error } = await sb.from('documents').update({
@@ -546,17 +623,40 @@
             await loadAll();
         });
 
-        // Ouvrir / supprimer depuis les listes
-        document.addEventListener('click', async (e) => {
-            const open = e.target.closest('[data-open]');
-            if (open) return openDocument(open.dataset.open);
+        // ===================== NAVIGATION =====================
+        const TAB_TITLES = { dashboard: 'Tableau de bord', clients: 'Clients', documents: 'Devis & factures', editor: 'Nouveau devis', settings: 'Paramètres' };
 
+        function switchTab(name) {
+            activeTab = name;
+            ['dashboard', 'clients', 'documents', 'editor', 'settings'].forEach((t) => {
+                $('tab-' + t).classList.toggle('hidden', t !== name);
+            });
+            document.querySelectorAll('header .tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
+            document.querySelectorAll('.nav-item').forEach((b) => {
+                const on = b.dataset.tab === name;
+                b.classList.toggle('active', on);
+                if (b.hasAttribute('data-fab')) b.querySelector('.nav-fab').classList.toggle('active', on);
+            });
+            $('mobile-title').textContent = TAB_TITLES[name] || '';
+            window.scrollTo(0, 0);
+        }
+
+        document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => {
+            if (b.dataset.tab === 'editor' && !current) newDocument();
+            if (b.dataset.tab === 'documents') { /* conserve le filtre client éventuel */ }
+            switchTab(b.dataset.tab);
+        }));
+        document.querySelectorAll('[data-tab-go]').forEach((b) => b.addEventListener('click', () => switchTab(b.dataset.tabGo)));
+        document.querySelectorAll('[data-goto-new]').forEach((b) => b.addEventListener('click', () => { newDocument(); switchTab('editor'); }));
+
+        // Clics dans les listes (ouvrir, client, supprimer)
+        document.addEventListener('click', async (e) => {
             const del = e.target.closest('[data-delete]');
             if (del) {
                 const doc = documents.find((d) => d.id === del.dataset.delete);
                 const ok = await confirmModal({
                     title: `Supprimer ${doc.number} ?`,
-                    text: 'Cette action est définitive. Les lignes du document seront supprimées aussi.',
+                    text: 'Cette action est définitive. Les prestations du document seront supprimées aussi.',
                     okLabel: 'Supprimer',
                     danger: true
                 });
@@ -568,50 +668,32 @@
                 return;
             }
 
-            const row = e.target.closest('[data-client]');
-            if (row) {
-                clientFilter = row.dataset.client;
-                $('d-kind').value = '';
-                $('d-status').value = '';
+            const open = e.target.closest('[data-open]');
+            if (open && !e.target.closest('select')) return openDocument(open.dataset.open);
+
+            const client = e.target.closest('[data-client]');
+            if (client) {
+                clientFilter = client.dataset.client;
+                kindFilter = ''; statusFilter = '';
                 $('d-search').value = '';
+                document.querySelectorAll('#kind-chips .chip').forEach((c, i) => c.classList.toggle('active', i === 0));
+                document.querySelectorAll('#status-chips .chip').forEach((c, i) => c.classList.toggle('active', i === 0));
                 renderDocuments();
                 switchTab('documents');
-                return;
-            }
-
-            const go = e.target.closest('[data-goto]');
-            if (go) {
-                if (go.dataset.goto === 'documents') clientFilter = null;
-                switchTab(go.dataset.goto);
             }
         });
-
-        // ===================== ONGLETS =====================
-        function switchTab(name) {
-            ['dashboard', 'clients', 'documents', 'editor', 'settings'].forEach((t) => {
-                const el = $('tab-' + t);
-                if (el) el.classList.toggle('hidden', t !== name);
-            });
-            document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
-            if (name !== 'documents') clientFilter = null;
-            window.scrollTo({ top: 0 });
-        }
-        document.querySelectorAll('.tab-btn').forEach((b) => b.addEventListener('click', () => {
-            if (b.dataset.tab === 'editor' && !current) newDocument();
-            switchTab(b.dataset.tab);
-        }));
 
         // ===================== ÉDITEUR =====================
         function lineRow(line = {}) {
             const row = document.createElement('div');
-            row.className = 'rounded-xl border border-brand-plum/10 p-3 space-y-2 bg-brand-cream/50';
+            row.className = 'rounded-xl border border-brand-plum/10 p-3 space-y-2 bg-brand-cream/60';
             row.innerHTML = `
-                <textarea class="l-desc" rows="2" placeholder="Description (ex: Nettoyage canapé 3 places)">${esc(line.description || '')}</textarea>
+                <textarea class="l-desc" rows="2" placeholder="Description (ex : Nettoyage canapé 3 places)">${esc(line.description || '')}</textarea>
                 <div class="grid grid-cols-[1fr_1fr_1.2fr_auto] gap-2 items-end">
-                    <div><span class="label">Qté</span><input type="number" class="l-qty" min="0" step="1" value="${line.quantity ?? 1}"></div>
+                    <div><span class="label">Qté</span><input type="number" class="l-qty" min="0" step="1" inputmode="decimal" value="${line.quantity ?? 1}"></div>
                     <div><span class="label">Unité</span><input type="text" class="l-unit" value="${esc(line.unit ?? 'unité')}"></div>
-                    <div><span class="label">Prix unit. HT (€)</span><input type="number" class="l-price" min="0" step="0.01" value="${line.unit_price ?? 0}"></div>
-                    <button type="button" class="l-del mb-0.5 text-xs font-bold px-2.5 py-2 rounded-lg text-red-800 hover:bg-red-50" aria-label="Supprimer la ligne">✕</button>
+                    <div><span class="label">Prix HT (€)</span><input type="number" class="l-price" min="0" step="0.01" inputmode="decimal" value="${line.unit_price ?? 0}"></div>
+                    <button type="button" class="l-del min-h-[44px] w-11 rounded-xl text-red-800 hover:bg-red-50 text-lg" aria-label="Supprimer la ligne">✕</button>
                 </div>`;
             row.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('input', refreshPreview));
             row.querySelector('.l-del').addEventListener('click', () => { row.remove(); refreshPreview(); });
@@ -665,7 +747,7 @@
             currentClientId = doc.client_id || null;
             $('e-client').value = currentClientId || '';
             const c = doc.client || {};
-            document.querySelectorAll('input[name="c-type"]').forEach((r) => { r.checked = r.value === (c.type || 'Particulier'); });
+            document.querySelectorAll('input[name="c-type"]').forEach((r) => { r.checked = r.value === (c.type || doc.client_type || 'Particulier'); });
             $('c-name').value = c.name ?? doc.client_name ?? '';
             $('c-address').value = c.address ?? doc.client_address ?? '';
             $('c-email').value = c.email ?? doc.client_email ?? '';
@@ -674,7 +756,7 @@
             $('lines').innerHTML = '';
             const lines = doc.document_lines?.length ? doc.document_lines : [{ quantity: 1, unit: 'unité', unit_price: 0 }];
             lines.forEach((l) => $('lines').appendChild(lineRow(l)));
-            $('e-title').textContent = doc.id ? `${doc.kind === 'devis' ? 'Devis' : 'Facture'} ${doc.number}` : 'Nouveau document';
+            $('e-title').textContent = doc.id ? `${kindLabel(doc.kind)} ${doc.number}` : 'Nouveau devis';
             $('e-state').textContent = doc.id ? STATUS[doc.status] : 'Non enregistré';
             $('btn-convert').classList.toggle('hidden', !(doc.id && doc.kind === 'devis'));
             refreshPreview();
@@ -685,7 +767,7 @@
             fillForm({ kind: 'devis', status: 'brouillon', number: '', issue_date: today(), validity_days: 30, deposit_percent: 0, micro: true, lines: [] });
         }
 
-        function openDocument(id) {
+        async function openDocument(id) {
             const doc = documents.find((d) => d.id === id);
             if (!doc) return;
             current = doc;
@@ -693,16 +775,20 @@
             switchTab('editor');
         }
 
-        // Aperçu : reconstruit à partir du formulaire
+        $('btn-reset').addEventListener('click', async () => {
+            const ok = await confirmModal({ title: 'Vider le formulaire ?', text: 'Les modifications non enregistrées seront perdues.', okLabel: 'Vider' });
+            if (ok) newDocument();
+        });
+
         function refreshPreview() {
             const f = readForm();
-            renderDoc({ ...f, id: current?.id, number: f.number || (current?.number ?? 'Numéro automatique'), issuer: settings.issuer });
+            renderDoc({ ...f, number: f.number || (current?.number ?? 'Automatique'), issuer: settings.issuer });
         }
 
         $('e-client').addEventListener('change', () => {
             const c = clients.find((x) => x.id === $('e-client').value);
             currentClientId = c ? c.id : null;
-            if (!c) return;
+            if (!c) return refreshPreview();
             document.querySelectorAll('input[name="c-type"]').forEach((r) => { r.checked = r.value === c.type; });
             $('c-name').value = c.name; $('c-address').value = c.address || ''; $('c-email').value = c.email || '';
             $('c-phone').value = c.phone || ''; $('c-siret').value = c.siret || '';
@@ -716,25 +802,34 @@
             refreshPreview();
         });
 
-        $('btn-add-line').addEventListener('click', () => { $('lines').appendChild(lineRow({ quantity: 1, unit: 'unité', unit_price: 0 })); refreshPreview(); });
+        $('btn-add-line').addEventListener('click', () => {
+            $('lines').appendChild(lineRow({ quantity: 1, unit: 'unité', unit_price: 0 }));
+            refreshPreview();
+        });
 
         ['e-kind', 'e-status', 'e-number', 'e-date', 'e-validity', 'e-deposit', 'e-object', 'c-name', 'c-address', 'c-email', 'c-phone', 'c-siret', 'e-notes']
             .forEach((id) => $(id).addEventListener('input', refreshPreview));
         ['e-kind', 'e-status', 'e-micro'].forEach((id) => $(id).addEventListener('change', refreshPreview));
         document.querySelectorAll('input[name="c-type"]').forEach((r) => r.addEventListener('change', refreshPreview));
 
-        // Enregistrer : client, numéro, document, lignes
+        // Aperçu : ouvert automatiquement sur grand écran, replié sur mobile
+        const wide = window.matchMedia('(min-width: 1280px)');
+        const syncPreview = () => { $('preview-wrap').open = wide.matches; };
+        syncPreview();
+        wide.addEventListener('change', syncPreview);
+
         $('btn-save').addEventListener('click', saveDocument);
 
         async function saveDocument() {
             const f = readForm();
             if (!f.client.name) return toast('Indiquez le nom du client.', true);
             if (!f.lines.some((l) => l.description || l.unit_price)) return toast('Ajoutez au moins une prestation.', true);
-            $('btn-save').disabled = true;
-            $('btn-save').textContent = 'Enregistrement…';
+            const btn = $('btn-save');
+            btn.disabled = true;
+            btn.textContent = 'Enregistrement…';
 
             try {
-                // 1. Client : mise à jour ou création
+                // 1. Client
                 let clientId = currentClientId;
                 const clientPayload = { type: f.client.type, name: f.client.name, address: f.client.address, email: f.client.email, phone: f.client.phone, siret: f.client.siret };
                 if (clientId) {
@@ -746,7 +841,7 @@
                     clientId = data.id;
                 }
 
-                // 2. Numéro : attribué à la première sauvegarde
+                // 2. Numéro à la première sauvegarde
                 let number = f.number;
                 if (!current) {
                     const { data, error } = await sb.rpc('next_number', { kind_in: f.kind });
@@ -754,7 +849,7 @@
                     number = data;
                 }
 
-                // 3. Document (avec snapshot du client et de l'émetteur)
+                // 3. Document
                 const payload = {
                     kind: f.kind,
                     number,
@@ -787,40 +882,39 @@
                     docId = data.id;
                 }
 
-                // 4. Lignes : on remplace l'ensemble
+                // 4. Prestations : on remplace l'ensemble
                 const { error: delErr } = await sb.from('document_lines').delete().eq('document_id', docId);
                 if (delErr) throw delErr;
                 if (f.lines.length) {
-                    const rows = f.lines.map((l) => ({ ...l, document_id: docId }));
-                    const { error: insErr } = await sb.from('document_lines').insert(rows);
+                    const { error: insErr } = await sb.from('document_lines').insert(f.lines.map((l) => ({ ...l, document_id: docId })));
                     if (insErr) throw insErr;
                 }
 
                 toast(`${number} enregistré`);
                 await loadAll();
-                openDocument(docId);
+                const saved = documents.find((d) => d.id === docId);
+                current = saved;
+                fillForm(saved);
             } catch (err) {
                 toast('Erreur : ' + (err.message || err), true);
+                console.error(err);
             } finally {
-                $('btn-save').disabled = false;
-                $('btn-save').textContent = 'Enregistrer';
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
             }
         }
 
-        // Créer une facture à partir d'un devis enregistré
+        // Créer une facture à partir d'un devis
         $('btn-convert').addEventListener('click', async () => {
             if (!current || current.kind !== 'devis') return;
             const ok = await confirmModal({
                 title: 'Créer la facture ?',
-                text: `Une nouvelle facture sera créée à partir de ${current.number}, avec les mêmes prestations.`,
+                text: `Une facture sera créée à partir de ${current.number}, avec les mêmes prestations.`,
                 okLabel: 'Créer la facture'
             });
             if (!ok) return;
             const { data: num, error: numErr } = await sb.rpc('next_number', { kind_in: 'facture' });
             if (numErr) return toast('Erreur : ' + numErr.message, true);
-            const lines = current.document_lines.map((l) => ({
-                position: l.position, description: l.description, quantity: l.quantity, unit: l.unit, unit_price: l.unit_price
-            }));
             const { data: inv, error } = await sb.from('documents').insert({
                 kind: 'facture', number: num, status: 'envoye',
                 client_id: current.client_id, client_name: current.client_name, client_address: current.client_address,
@@ -831,14 +925,45 @@
                 parent_id: current.id
             }).select().single();
             if (error) return toast('Erreur : ' + error.message, true);
-            const { error: lineErr } = await sb.from('document_lines').insert(lines.map((l) => ({ ...l, document_id: inv.id })));
+            const lines = current.document_lines.map((l) => ({
+                document_id: inv.id, position: l.position, description: l.description,
+                quantity: l.quantity, unit: l.unit, unit_price: l.unit_price
+            }));
+            const { error: lineErr } = await sb.from('document_lines').insert(lines);
             if (lineErr) return toast('Erreur : ' + lineErr.message, true);
             toast(`Facture ${num} créée`);
             await loadAll();
             openDocument(inv.id);
         });
 
-        $('btn-print').addEventListener('click', () => { refreshPreview(); window.print(); });
+        // ===================== PDF (une seule page A4) =====================
+        $('btn-pdf').addEventListener('click', async () => {
+            const btn = $('btn-pdf');
+            btn.disabled = true;
+            btn.textContent = 'Création…';
+            try {
+                refreshPreview();
+                const f = readForm();
+                const number = f.number || current?.number || 'document';
+                $('pdf-stage').innerHTML = `<div class="doc-page">${$('doc').innerHTML}</div>`;
+                const el = $('pdf-stage').firstElementChild;
+                await html2pdf().set({
+                    margin: 0,
+                    filename: `${number}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 794 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all'] }
+                }).from(el).save();
+            } catch (err) {
+                toast('Erreur PDF : ' + err.message, true);
+                console.error(err);
+            } finally {
+                $('pdf-stage').innerHTML = '';
+                btn.disabled = false;
+                btn.textContent = 'PDF';
+            }
+        });
 
         // ===================== PARAMÈTRES =====================
         function fillIssuerForm() {
@@ -875,12 +1000,12 @@
 
             const rows = lines.map((l, idx) => `
                 <tr class="border-b border-brand-plum/10">
-                    <td class="py-2.5 px-2 align-top text-center opacity-70">${idx + 1}</td>
-                    <td class="py-2.5 px-2 align-top whitespace-pre-line">${esc(l.description)}</td>
-                    <td class="py-2.5 px-2 align-top text-center">${esc(l.unit)}</td>
-                    <td class="py-2.5 px-2 align-top text-right">${l.quantity}</td>
-                    <td class="py-2.5 px-2 align-top text-right">${eur(l.unit_price)}</td>
-                    <td class="py-2.5 px-2 align-top text-right font-bold">${eur(l.quantity * l.unit_price)}</td>
+                    <td class="py-2 px-2 align-top text-center opacity-70">${idx + 1}</td>
+                    <td class="py-2 px-2 align-top whitespace-pre-line">${esc(l.description)}</td>
+                    <td class="py-2 px-2 align-top text-center">${esc(l.unit)}</td>
+                    <td class="py-2 px-2 align-top text-right">${l.quantity}</td>
+                    <td class="py-2 px-2 align-top text-right">${eur(l.unit_price)}</td>
+                    <td class="py-2 px-2 align-top text-right font-bold">${eur(l.quantity * l.unit_price)}</td>
                 </tr>`).join('');
 
             $('doc').innerHTML = `
@@ -892,7 +1017,7 @@
                     </div>
                 </div>
 
-                <div class="doc-body flex-1 px-10 pt-8 pb-10 space-y-8">
+                <div class="doc-body flex-1 flex flex-col px-10 pt-8 pb-8 gap-7">
                     <div class="grid grid-cols-2 gap-8">
                         <div class="space-y-1">
                             <p class="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-2">Émetteur</p>
@@ -960,7 +1085,7 @@
                     </div>
 
                     ${!isInvoice ? `
-                    <div class="grid grid-cols-2 gap-8 pt-6 text-[11px]">
+                    <div class="grid grid-cols-2 gap-8 pt-4 text-[11px]">
                         <div class="border border-brand-plum/20 rounded-xl p-4 h-28">
                             <p class="font-bold">Bon pour accord</p>
                             <p class="opacity-60 mt-1">Date et signature du client, précédées de la mention « Lu et approuvé »</p>
