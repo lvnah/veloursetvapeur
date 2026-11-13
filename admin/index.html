@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Administration | Velours & Vapeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        brand: { plum: '#4a1531', plumDark: '#2d0c1d', plumLight: '#73234d', cream: '#fcfaf8', beige: '#f0e8df' }
+                    },
+                    boxShadow: { soft: '0 20px 50px -28px rgba(74, 21, 49, .28)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        .doc-page { width: 210mm; min-height: 297mm; }
+        input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea, select {
+            width: 100%;
+            padding: .6rem .75rem;
+            background: #fcfaf8;
+            border: 1px solid rgba(74, 21, 49, .12);
+            border-radius: .75rem;
+            font-size: .875rem;
+            color: #4a1531;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #4a1531; box-shadow: 0 0 0 1px #4a1531; }
+        .label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(74, 21, 49, .7); margin-bottom: .35rem; }
+        .tab-btn { font-size: 12px; font-weight: 700; padding: .55rem 1rem; border-radius: 999px; color: rgba(252, 250, 248, .75); }
+        .tab-btn.active { background: #fcfaf8; color: #4a1531; }
+        .card { background: #fff; border: 1px solid rgba(74, 21, 49, .06); border-radius: 1rem; box-shadow: 0 20px 50px -28px rgba(74, 21, 49, .28); }
+        @media print {
+            body { background: #fff !important; }
+            .no-print { display: none !important; }
+            .print-area { padding: 0 !important; margin: 0 !important; }
+            .doc-page { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; border: 0 !important; }
+            @page { size: A4; margin: 10mm; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+
+<body class="bg-brand-cream text-brand-plum font-sans antialiased min-h-screen">
+
+    <!-- CONNEXION -->
+    <div id="login" class="hidden min-h-screen flex items-center justify-center p-4">
+        <form id="login-form" class="w-full max-w-sm bg-white rounded-[24px] shadow-soft border border-brand-plum/5 p-8 space-y-5">
+            <div class="text-center space-y-3">
+                <img src="../images/logo.png" alt="Velours & Vapeur" class="h-10 mx-auto bg-brand-plum rounded-xl px-3 py-2">
+                <h1 class="text-xl font-black">Espace administration</h1>
+            </div>
+            <div>
+                <label class="label" for="l-email">Email</label>
+                <input type="email" id="l-email" autocomplete="username" required>
+            </div>
+            <div>
+                <label class="label" for="l-pwd">Mot de passe</label>
+                <input type="password" id="l-pwd" autocomplete="current-password" required>
+            </div>
+            <p id="login-error" class="hidden text-xs font-bold text-red-700"></p>
+            <button type="submit" class="w-full bg-brand-plum text-brand-cream py-3.5 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight transition-colors">Se connecter</button>
+        </form>
+    </div>
+
+    <!-- APPLICATION -->
+    <div id="app" class="hidden">
+        <header class="no-print sticky top-0 z-30 bg-brand-plum text-brand-cream">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="../images/logo.png" alt="Velours & Vapeur" class="h-8 w-auto">
+                    <span class="hidden md:inline text-xs font-bold uppercase tracking-widest opacity-70">Administration</span>
+                </div>
+                <nav class="flex items-center gap-1 overflow-x-auto">
+                    <button class="tab-btn" data-tab="dashboard">Tableau de bord</button>
+                    <button class="tab-btn" data-tab="clients">Clients</button>
+                    <button class="tab-btn" data-tab="documents">Devis &amp; factures</button>
+                    <button class="tab-btn" data-tab="editor">Nouveau</button>
+                    <button class="tab-btn" data-tab="settings">Paramètres</button>
+                </nav>
+                <button id="btn-logout" class="text-xs font-bold px-3 py-2 opacity-70 hover:opacity-100 shrink-0">Quitter</button>
+            </div>
+        </header>
+
+        <div id="toast" class="no-print hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full bg-brand-plumDark text-brand-cream text-xs font-bold shadow-soft"></div>
+
+        <!-- TABLEAU DE BORD -->
+        <section id="tab-dashboard" class="no-print max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card p-5"><p class="label">Encaissé</p><p id="k-paid" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures payées</p></div>
+                <div class="card p-5"><p class="label">En attente</p><p id="k-pending" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Factures envoyées, non payées</p></div>
+                <div class="card p-5"><p class="label">Devis en cours</p><p id="k-quotes" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Brouillons et devis envoyés</p></div>
+                <div class="card p-5"><p class="label">Clients</p><p id="k-clients" class="text-2xl font-black">—</p><p class="text-[11px] opacity-60 mt-1">Enregistrés</p></div>
+            </div>
+            <div class="card p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-black uppercase tracking-wider">Derniers documents</h2>
+                    <button class="text-xs font-bold underline" data-goto="documents">Voir tout</button>
+                </div>
+                <div id="recent-docs" class="space-y-2"></div>
+            </div>
+        </section>
+
+        <!-- CLIENTS -->
+        <section id="tab-clients" class="no-print hidden max-w-[1400px] mx-auto p-4 sm:p-6">
+            <div class="card overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-brand-plum text-brand-cream text-xs">
+                        <tr>
+                            <th class="text-left p-3 font-bold">Client</th>
+                            <th class="text-left p-3 font-bold hidden md:table-cell">Type</th>
+                            <th class="text-right p-3 font-bold">Devis</th>
+                            <th class="text-right p-3 font-bold">Factures</th>
+                            <th class="text-right p-3 font-bold">Facturé</th>
+                            <th class="text-right p-3 font-bold">Encaissé</th>
+                            <th class="text-right p-3 font-bold">Reste dû</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clients-body"></tbody>
+                </table>
+            </div>
+            <p class="text-[11px] opacity-60 mt-3">Cliquez sur un client pour voir ses devis et factures.</p>
+        </section>
+
+        <!-- DOCUMENTS -->
+        <section id="tab-documents" class="no-print hidden max-w-[1400px] mx-auto p-4 sm:p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="d-search" placeholder="Rechercher (client, numéro, objet)" class="sm:max-w-sm">
+                <select id="d-kind" class="sm:max-w-[180px]">
+                    <option value="">Devis et factures</option>
+                    <option value="devis">Devis</option>
+                    <option value="facture">Factures</option>
+                </select>
+                <select id="d-status" class="sm:max-w-[180px]">
+                    <option value="">Tous les statuts</option>
+                    <option value="brouillon">Brouillon</option>
+                    <option value="envoye">Envoyé</option>
+                    <option value="accepte">Accepté</option>
+                    <option value="paye">Payé</option>
+                    <option value="annule">Annulé</option>
+                </select>
+            </div>
+            <div class="card overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-brand-plum text-brand-cream text-xs">
+                        <tr>
+                            <th class="text-left p-3 font-bold">Numéro</th>
+                            <th class="text-left p-3 font-bold">Client</th>
+                            <th class="text-left p-3 font-bold hidden md:table-cell">Date</th>
+                            <th class="text-right p-3 font-bold">Montant TTC</th>
+                            <th class="text-left p-3 font-bold">Statut</th>
+                            <th class="p-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="docs-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ÉDITEUR -->
+        <div id="tab-editor" class="hidden max-w-[1400px] mx-auto p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-[460px_1fr] gap-6">
+            <aside class="no-print space-y-5">
+                <section class="card p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-black uppercase tracking-wider" id="e-title">Nouveau document</h2>
+                        <span id="e-state" class="text-[10px] font-bold uppercase tracking-wider opacity-50">Brouillon</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="label" for="e-kind">Type</label>
+                            <select id="e-kind"><option value="devis">Devis</option><option value="facture">Facture</option></select></div>
+                        <div><label class="label" for="e-status">Statut</label>
+                            <select id="e-status">
+                                <option value="brouillon">Brouillon</option>
+                                <option value="envoye">Envoyé</option>
+                                <option value="accepte">Accepté</option>
+                                <option value="paye">Payé</option>
+                                <option value="annule">Annulé</option>
+                            </select></div>
+                        <div><label class="label" for="e-number">Numéro</label><input type="text" id="e-number" placeholder="Automatique"></div>
+                        <div><label class="label" for="e-date">Date</label><input type="date" id="e-date"></div>
+                        <div><label class="label" for="e-validity">Validité (jours)</label><input type="number" id="e-validity" min="1"></div>
+                        <div><label class="label" for="e-deposit">Acompte (%)</label><input type="number" id="e-deposit" min="0" max="100"></div>
+                    </div>
+                    <div><label class="label" for="e-object">Objet de la prestation</label><input type="text" id="e-object" placeholder="Ex: Nettoyage canapé et matelas"></div>
+                </section>
+
+                <section class="card p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-black uppercase tracking-wider">Client</h2>
+                        <button id="btn-new-client" class="text-xs font-bold underline">Nouveau client</button>
+                    </div>
+                    <div><label class="label" for="e-client">Choisir un client</label>
+                        <select id="e-client"><option value="">— Nouveau client —</option></select></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 text-xs font-bold p-2.5 rounded-xl border border-brand-plum/10 cursor-pointer"><input type="radio" name="c-type" value="Particulier" class="accent-brand-plum"> Particulier</label>
+                        <label class="flex items-center gap-2 text-xs font-bold p-2.5 rounded-xl border border-brand-plum/10 cursor-pointer"><input type="radio" name="c-type" value="Professionnel" class="accent-brand-plum"> Professionnel</label>
+                    </div>
+                    <div><label class="label" for="c-name">Nom / Entreprise</label><input type="text" id="c-name"></div>
+                    <div><label class="label" for="c-address">Adresse</label><textarea id="c-address" rows="2"></textarea></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="label" for="c-email">Email</label><input type="email" id="c-email"></div>
+                        <div><label class="label" for="c-phone">Téléphone</label><input type="tel" id="c-phone"></div>
+                    </div>
+                    <div><label class="label" for="c-siret">SIRET (si professionnel)</label><input type="text" id="c-siret"></div>
+                </section>
+
+                <section class="card p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-black uppercase tracking-wider">Prestations</h2>
+                        <button id="btn-add-line" class="text-xs font-bold px-3 py-1.5 rounded-full bg-brand-plum text-brand-cream">+ Ligne</button>
+                    </div>
+                    <div id="lines" class="space-y-3"></div>
+                    <div class="flex items-center gap-2 text-xs font-medium pt-2 border-t border-brand-plum/10">
+                        <input type="checkbox" id="e-micro" class="accent-brand-plum w-4 h-4">
+                        <label for="e-micro">Micro-entreprise : TVA non applicable, art. 293 B du CGI</label>
+                    </div>
+                </section>
+
+                <section class="card p-5 space-y-3">
+                    <h2 class="text-sm font-black uppercase tracking-wider">Notes</h2>
+                    <textarea id="e-notes" rows="3" placeholder="Informations affichées sur le document"></textarea>
+                </section>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btn-save" class="col-span-2 bg-brand-plum text-brand-cream py-3.5 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight">Enregistrer</button>
+                    <button id="btn-convert" class="hidden bg-white border border-brand-plum/20 py-3 rounded-full font-bold text-xs hover:bg-brand-beige">Créer la facture</button>
+                    <button id="btn-print" class="bg-white border border-brand-plum/20 py-3 rounded-full font-bold text-xs hover:bg-brand-beige">Imprimer / PDF</button>
+                </div>
+            </aside>
+
+            <main class="print-area min-w-0">
+                <div class="no-print mb-3 text-xs font-bold uppercase tracking-wider opacity-60">Aperçu</div>
+                <div class="overflow-auto">
+                    <article id="doc" class="doc-page mx-auto bg-white shadow-soft border border-brand-plum/5 text-[12px] text-brand-plum"></article>
+                </div>
+            </main>
+        </div>
+
+        <!-- PARAMÈTRES -->
+        <section id="tab-settings" class="no-print hidden max-w-2xl mx-auto p-4 sm:p-6">
+            <form id="settings-form" class="card p-6 space-y-4">
+                <h2 class="text-sm font-black uppercase tracking-wider">Mes coordonnées</h2>
+                <div><label class="label" for="i-name">Nom</label><input type="text" id="i-name"></div>
+                <div><label class="label" for="i-brand">Enseigne</label><input type="text" id="i-brand"></div>
+                <div><label class="label" for="i-address">Adresse</label><textarea id="i-address" rows="2"></textarea></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="label" for="i-email">Email</label><input type="email" id="i-email"></div>
+                    <div><label class="label" for="i-phone">Téléphone</label><input type="tel" id="i-phone"></div>
+                </div>
+                <div><label class="label" for="i-siret">SIRET</label><input type="text" id="i-siret"></div>
+                <button type="submit" class="bg-brand-plum text-brand-cream px-6 py-3 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight">Enregistrer</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        // ===================== CONFIGURATION =====================
+        const SUPABASE_URL = 'https://lkjlbtwreqtefinkhwsg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_5iMONV7Cyd3BbOArHfuXwQ_dPyQ5lY7';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const DEFAULT_ISSUER = {
+            name: 'Guillaume CHARPEIL',
+            brand: 'Velours & Vapeur',
+            address: '7 chemin des jardins\n66350 Toulouges, France',
+            email: 'veloursetvapeur@gmail.com',
+            phone: '06 95 79 57 91',
+            siret: '938 963 474 00015'
+        };
+
+        // ===================== ÉTAT =====================
+        let settings = { issuer: DEFAULT_ISSUER };
+        let clients = [];
+        let documents = [];        // avec lignes et client joint
+        let current = null;        // document ouvert dans l'éditeur (null = nouveau)
+        let currentClientId = null;
+
+        // ===================== OUTILS =====================
+        const $ = (id) => document.getElementById(id);
+        const eur = (n) => Number(n || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        const fmtDate = (iso) => iso ? new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR') : '';
+        const addDays = (iso, days) => { const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); };
+        const today = () => new Date().toISOString().slice(0, 10);
+        function esc(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+        function nl2br(s) { return esc(s).replace(/\n/g, '<br>'); }
+        function toast(msg, isError = false) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.style.background = isError ? '#7f1d1d' : '';
+            t.classList.remove('hidden');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => t.classList.add('hidden'), 3000);
+        }
+        const STATUS = {
+            brouillon: 'Brouillon', envoye: 'Envoyé', accepte: 'Accepté', paye: 'Payé', annule: 'Annulé'
+        };
+        const STATUS_STYLE = {
+            brouillon: 'bg-brand-beige text-brand-plum',
+            envoye: 'bg-amber-100 text-amber-900',
+            accepte: 'bg-sky-100 text-sky-900',
+            paye: 'bg-emerald-100 text-emerald-900',
+            annule: 'bg-red-100 text-red-900'
+        };
+        const badge = (s) => `<span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${STATUS_STYLE[s] || ''}">${STATUS[s] || s}</span>`;
+
+        // Montants d'un document à partir de ses lignes
+        function totalsOf(doc) {
+            const ht = (doc.document_lines || []).reduce((acc, l) => acc + Number(l.quantity) * Number(l.unit_price), 0);
+            const vat = doc.micro ? 0 : ht * 0.2;
+            const ttc = ht + vat;
+            return { ht, vat, ttc };
+        }
+
+        // ===================== CONNEXION =====================
+        $('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            $('login-error').classList.add('hidden');
+            const { error } = await sb.auth.signInWithPassword({ email: $('l-email').value.trim(), password: $('l-pwd').value });
+            if (error) {
+                $('login-error').textContent = 'Email ou mot de passe incorrect.';
+                $('login-error').classList.remove('hidden');
+                return;
+            }
+            await showApp();
+        });
+
+        $('btn-logout').addEventListener('click', async () => {
+            await sb.auth.signOut();
+            location.reload();
+        });
+
+        async function showApp() {
+            $('login').classList.add('hidden');
+            $('app').classList.remove('hidden');
+            await loadAll();
+            newDocument();
+            switchTab('dashboard');
+        }
+
+        // ===================== CHARGEMENT =====================
+        async function loadAll() {
+            const [s, c, d] = await Promise.all([
+                sb.from('settings').select('*').eq('id', 1).single(),
+                sb.from('clients').select('*').order('name'),
+                sb.from('documents').select('*, document_lines(*), clients(name, type)').order('created_at', { ascending: false })
+            ]);
+            if (s.error || c.error || d.error) {
+                toast('Erreur de chargement : ' + (s.error || c.error || d.error).message, true);
+                return;
+            }
+            settings = s.data;
+            settings.issuer = { ...DEFAULT_ISSUER, ...(settings.issuer || {}) };
+            clients = c.data;
+            documents = d.data.map((doc) => ({ ...doc, document_lines: (doc.document_lines || []).sort((a, b) => a.position - b.position) }));
+            fillIssuerForm();
+            renderDashboard();
+            renderClients();
+            renderDocuments();
+            fillClientSelect();
+        }
+
+        // ===================== TABLEAU DE BORD =====================
+        function renderDashboard() {
+            const invoices = documents.filter((d) => d.kind === 'facture' && d.status !== 'annule');
+            const quotes = documents.filter((d) => d.kind === 'devis' && ['brouillon', 'envoye'].includes(d.status));
+            const sum = (list) => list.reduce((acc, d) => acc + totalsOf(d).ttc, 0);
+
+            $('k-paid').textContent = eur(sum(invoices.filter((d) => d.status === 'paye')));
+            $('k-pending').textContent = eur(sum(invoices.filter((d) => d.status === 'envoye')));
+            $('k-quotes').textContent = eur(sum(quotes));
+            $('k-clients').textContent = clients.length;
+
+            $('recent-docs').innerHTML = documents.slice(0, 6).map((d) => `
+                <button data-open="${d.id}" class="w-full flex items-center justify-between gap-3 p-3 rounded-xl border border-brand-plum/10 hover:bg-brand-beige/40 text-left">
+                    <div class="min-w-0">
+                        <p class="font-bold text-sm truncate">${esc(d.number)} · ${esc(clientName(d))}</p>
+                        <p class="text-xs opacity-60">${fmtDate(d.issue_date)} · ${esc(d.object)}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <p class="font-black text-sm">${eur(totalsOf(d).ttc)}</p>
+                        ${badge(d.status)}
+                    </div>
+                </button>`).join('') || '<p class="text-sm opacity-60">Aucun document pour le moment.</p>';
+        }
+
+        // ===================== CLIENTS =====================
+        function clientName(doc) { return doc.client_name || doc.clients?.name || 'Sans nom'; }
+
+        function renderClients() {
+            const rows = clients.map((c) => {
+                const docs = documents.filter((d) => d.client_id === c.id);
+                const quotes = docs.filter((d) => d.kind === 'devis' && d.status !== 'annule');
+                const invoices = docs.filter((d) => d.kind === 'facture' && d.status !== 'annule');
+                const billed = invoices.reduce((acc, d) => acc + totalsOf(d).ttc, 0);
+                const paid = invoices.filter((d) => d.status === 'paye').reduce((acc, d) => acc + totalsOf(d).ttc, 0);
+                return `
+                    <tr class="border-t border-brand-plum/10 hover:bg-brand-beige/40 cursor-pointer" data-client="${c.id}">
+                        <td class="p-3 font-bold">${esc(c.name)}</td>
+                        <td class="p-3 hidden md:table-cell opacity-70">${esc(c.type)}</td>
+                        <td class="p-3 text-right">${quotes.length}</td>
+                        <td class="p-3 text-right">${invoices.length}</td>
+                        <td class="p-3 text-right">${eur(billed)}</td>
+                        <td class="p-3 text-right text-emerald-800 font-bold">${eur(paid)}</td>
+                        <td class="p-3 text-right ${billed - paid > 0 ? 'text-amber-800 font-bold' : ''}">${eur(billed - paid)}</td>
+                    </tr>`;
+            }).join('');
+            $('clients-body').innerHTML = rows || `<tr><td colspan="7" class="p-6 text-center opacity-60">Aucun client enregistré.</td></tr>`;
+        }
+
+        function fillClientSelect() {
+            const sel = $('e-client');
+            const keep = sel.value;
+            sel.innerHTML = '<option value="">— Nouveau client —</option>' +
+                clients.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+            sel.value = keep;
+        }
+
+        // ===================== DOCUMENTS =====================
+        let clientFilter = null;
+
+        function renderDocuments() {
+            const q = $('d-search').value.trim().toLowerCase();
+            const kind = $('d-kind').value;
+            const status = $('d-status').value;
+            const list = documents.filter((d) =>
+                (!kind || d.kind === kind) &&
+                (!status || d.status === status) &&
+                (!clientFilter || d.client_id === clientFilter) &&
+                (!q || [d.number, clientName(d), d.object].some((v) => (v || '').toLowerCase().includes(q)))
+            );
+            $('docs-body').innerHTML = list.map((d) => `
+                <tr class="border-t border-brand-plum/10 hover:bg-brand-beige/30">
+                    <td class="p-3 font-bold whitespace-nowrap">${esc(d.number)}<span class="block text-[10px] font-medium uppercase opacity-50">${d.kind === 'devis' ? 'Devis' : 'Facture'}</span></td>
+                    <td class="p-3">${esc(clientName(d))}<span class="block text-xs opacity-60 truncate max-w-[220px]">${esc(d.object)}</span></td>
+                    <td class="p-3 hidden md:table-cell whitespace-nowrap">${fmtDate(d.issue_date)}</td>
+                    <td class="p-3 text-right font-bold whitespace-nowrap">${eur(totalsOf(d).ttc)}</td>
+                    <td class="p-3"><select data-status="${d.id}" class="!w-auto !py-1.5 !text-xs">
+                        ${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${k === d.status ? 'selected' : ''}>${v}</option>`).join('')}
+                    </select></td>
+                    <td class="p-3 whitespace-nowrap text-right">
+                        <button data-open="${d.id}" class="text-xs font-bold px-3 py-1.5 rounded-full bg-brand-plum text-brand-cream">Ouvrir</button>
+                        <button data-delete="${d.id}" class="text-xs font-bold px-2 py-1.5 text-red-800">Supprimer</button>
+                    </td>
+                </tr>`).join('') || `<tr><td colspan="6" class="p-6 text-center opacity-60">Aucun document.</td></tr>`;
+        }
+
+        $('d-search').addEventListener('input', renderDocuments);
+        $('d-kind').addEventListener('change', renderDocuments);
+        $('d-status').addEventListener('change', renderDocuments);
+
+        // Changer le statut directement depuis la liste
+        $('docs-body').addEventListener('change', async (e) => {
+            const sel = e.target.closest('select[data-status]');
+            if (!sel) return;
+            const { error } = await sb.from('documents').update({
+                status: sel.value,
+                paid_at: sel.value === 'paye' ? today() : null,
+                updated_at: new Date().toISOString()
+            }).eq('id', sel.dataset.status);
+            if (error) return toast('Erreur : ' + error.message, true);
+            toast('Statut mis à jour');
+            await loadAll();
+        });
+
+        // Ouvrir / supprimer depuis les listes
+        document.addEventListener('click', async (e) => {
+            const open = e.target.closest('[data-open]');
+            if (open) return openDocument(open.dataset.open);
+
+            const del = e.target.closest('[data-delete]');
+            if (del) {
+                const doc = documents.find((d) => d.id === del.dataset.delete);
+                if (!confirm(`Supprimer ${doc.number} ? Cette action est définitive.`)) return;
+                const { error } = await sb.from('documents').delete().eq('id', doc.id);
+                if (error) return toast('Erreur : ' + error.message, true);
+                toast('Document supprimé');
+                await loadAll();
+                return;
+            }
+
+            const row = e.target.closest('[data-client]');
+            if (row) {
+                clientFilter = row.dataset.client;
+                $('d-kind').value = '';
+                $('d-status').value = '';
+                $('d-search').value = '';
+                renderDocuments();
+                switchTab('documents');
+                return;
+            }
+
+            const go = e.target.closest('[data-goto]');
+            if (go) {
+                if (go.dataset.goto === 'documents') clientFilter = null;
+                switchTab(go.dataset.goto);
+            }
+        });
+
+        // ===================== ONGLETS =====================
+        function switchTab(name) {
+            ['dashboard', 'clients', 'documents', 'editor', 'settings'].forEach((t) => {
+                const el = $('tab-' + t);
+                if (el) el.classList.toggle('hidden', t !== name);
+            });
+            document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
+            if (name !== 'documents') clientFilter = null;
+            window.scrollTo({ top: 0 });
+        }
+        document.querySelectorAll('.tab-btn').forEach((b) => b.addEventListener('click', () => {
+            if (b.dataset.tab === 'editor' && !current) newDocument();
+            switchTab(b.dataset.tab);
+        }));
+
+        // ===================== ÉDITEUR =====================
+        function lineRow(line = {}) {
+            const row = document.createElement('div');
+            row.className = 'rounded-xl border border-brand-plum/10 p-3 space-y-2 bg-brand-cream/50';
+            row.innerHTML = `
+                <textarea class="l-desc" rows="2" placeholder="Description (ex: Nettoyage canapé 3 places)">${esc(line.description || '')}</textarea>
+                <div class="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
+                    <div><span class="label">Qté</span><input type="number" class="l-qty" min="0" step="1" value="${line.quantity ?? 1}"></div>
+                    <div><span class="label">Unité</span><input type="text" class="l-unit" value="${esc(line.unit ?? 'unité')}"></div>
+                    <div><span class="label">Prix unit. HT (€)</span><input type="number" class="l-price" min="0" step="0.01" value="${line.unit_price ?? 0}"></div>
+                    <button type="button" class="l-del mb-0.5 text-xs font-bold px-2.5 py-2 rounded-lg text-red-800 hover:bg-red-50" aria-label="Supprimer la ligne">✕</button>
+                </div>`;
+            row.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('input', refreshPreview));
+            row.querySelector('.l-del').addEventListener('click', () => { row.remove(); refreshPreview(); });
+            return row;
+        }
+
+        function readLines() {
+            return Array.from($('lines').children).map((row, i) => ({
+                position: i,
+                description: row.querySelector('.l-desc').value,
+                quantity: parseFloat(row.querySelector('.l-qty').value) || 0,
+                unit: row.querySelector('.l-unit').value || 'unité',
+                unit_price: parseFloat(row.querySelector('.l-price').value) || 0
+            }));
+        }
+
+        function readForm() {
+            const type = document.querySelector('input[name="c-type"]:checked');
+            return {
+                kind: $('e-kind').value,
+                status: $('e-status').value,
+                number: $('e-number').value.trim(),
+                issue_date: $('e-date').value || today(),
+                validity_days: parseInt($('e-validity').value, 10) || 30,
+                deposit_percent: parseFloat($('e-deposit').value) || 0,
+                object: $('e-object').value,
+                micro: $('e-micro').checked,
+                notes: $('e-notes').value,
+                client: {
+                    type: type ? type.value : 'Particulier',
+                    name: $('c-name').value.trim(),
+                    address: $('c-address').value,
+                    email: $('c-email').value,
+                    phone: $('c-phone').value,
+                    siret: $('c-siret').value
+                },
+                lines: readLines()
+            };
+        }
+
+        function fillForm(doc) {
+            $('e-kind').value = doc.kind;
+            $('e-status').value = doc.status;
+            $('e-number').value = doc.number || '';
+            $('e-date').value = doc.issue_date || today();
+            $('e-validity').value = doc.validity_days ?? 30;
+            $('e-deposit').value = doc.deposit_percent ?? 0;
+            $('e-object').value = doc.object || '';
+            $('e-micro').checked = doc.micro ?? true;
+            $('e-notes').value = doc.notes || '';
+            currentClientId = doc.client_id || null;
+            $('e-client').value = currentClientId || '';
+            const c = doc.client || {};
+            document.querySelectorAll('input[name="c-type"]').forEach((r) => { r.checked = r.value === (c.type || 'Particulier'); });
+            $('c-name').value = c.name ?? doc.client_name ?? '';
+            $('c-address').value = c.address ?? doc.client_address ?? '';
+            $('c-email').value = c.email ?? doc.client_email ?? '';
+            $('c-phone').value = c.phone ?? doc.client_phone ?? '';
+            $('c-siret').value = c.siret ?? doc.client_siret ?? '';
+            $('lines').innerHTML = '';
+            const lines = doc.document_lines?.length ? doc.document_lines : [{ quantity: 1, unit: 'unité', unit_price: 0 }];
+            lines.forEach((l) => $('lines').appendChild(lineRow(l)));
+            $('e-title').textContent = doc.id ? `${doc.kind === 'devis' ? 'Devis' : 'Facture'} ${doc.number}` : 'Nouveau document';
+            $('e-state').textContent = doc.id ? STATUS[doc.status] : 'Non enregistré';
+            $('btn-convert').classList.toggle('hidden', !(doc.id && doc.kind === 'devis'));
+            refreshPreview();
+        }
+
+        function newDocument() {
+            current = null;
+            fillForm({ kind: 'devis', status: 'brouillon', number: '', issue_date: today(), validity_days: 30, deposit_percent: 0, micro: true, lines: [] });
+        }
+
+        function openDocument(id) {
+            const doc = documents.find((d) => d.id === id);
+            if (!doc) return;
+            current = doc;
+            fillForm(doc);
+            switchTab('editor');
+        }
+
+        // Aperçu : reconstruit à partir du formulaire
+        function refreshPreview() {
+            const f = readForm();
+            renderDoc({ ...f, id: current?.id, number: f.number || (current?.number ?? 'Numéro automatique'), issuer: settings.issuer });
+        }
+
+        $('e-client').addEventListener('change', () => {
+            const c = clients.find((x) => x.id === $('e-client').value);
+            currentClientId = c ? c.id : null;
+            if (!c) return;
+            document.querySelectorAll('input[name="c-type"]').forEach((r) => { r.checked = r.value === c.type; });
+            $('c-name').value = c.name; $('c-address').value = c.address || ''; $('c-email').value = c.email || '';
+            $('c-phone').value = c.phone || ''; $('c-siret').value = c.siret || '';
+            refreshPreview();
+        });
+
+        $('btn-new-client').addEventListener('click', () => {
+            $('e-client').value = '';
+            currentClientId = null;
+            ['c-name', 'c-address', 'c-email', 'c-phone', 'c-siret'].forEach((id) => { $(id).value = ''; });
+            refreshPreview();
+        });
+
+        $('btn-add-line').addEventListener('click', () => { $('lines').appendChild(lineRow({ quantity: 1, unit: 'unité', unit_price: 0 })); refreshPreview(); });
+
+        ['e-kind', 'e-status', 'e-number', 'e-date', 'e-validity', 'e-deposit', 'e-object', 'c-name', 'c-address', 'c-email', 'c-phone', 'c-siret', 'e-notes']
+            .forEach((id) => $(id).addEventListener('input', refreshPreview));
+        ['e-kind', 'e-status', 'e-micro'].forEach((id) => $(id).addEventListener('change', refreshPreview));
+        document.querySelectorAll('input[name="c-type"]').forEach((r) => r.addEventListener('change', refreshPreview));
+
+        // Enregistrer : client, numéro, document, lignes
+        $('btn-save').addEventListener('click', saveDocument);
+
+        async function saveDocument() {
+            const f = readForm();
+            if (!f.client.name) return toast('Indiquez le nom du client.', true);
+            if (!f.lines.some((l) => l.description || l.unit_price)) return toast('Ajoutez au moins une prestation.', true);
+            $('btn-save').disabled = true;
+            $('btn-save').textContent = 'Enregistrement…';
+
+            try {
+                // 1. Client : mise à jour ou création
+                let clientId = currentClientId;
+                const clientPayload = { type: f.client.type, name: f.client.name, address: f.client.address, email: f.client.email, phone: f.client.phone, siret: f.client.siret };
+                if (clientId) {
+                    const { error } = await sb.from('clients').update(clientPayload).eq('id', clientId);
+                    if (error) throw error;
+                } else {
+                    const { data, error } = await sb.from('clients').insert(clientPayload).select().single();
+                    if (error) throw error;
+                    clientId = data.id;
+                }
+
+                // 2. Numéro : attribué à la première sauvegarde
+                let number = f.number;
+                if (!current) {
+                    const { data, error } = await sb.rpc('next_number', { kind_in: f.kind });
+                    if (error) throw error;
+                    number = data;
+                }
+
+                // 3. Document (avec snapshot du client et de l'émetteur)
+                const payload = {
+                    kind: f.kind,
+                    number,
+                    status: f.status,
+                    client_id: clientId,
+                    client_name: f.client.name,
+                    client_address: f.client.address,
+                    client_email: f.client.email,
+                    client_phone: f.client.phone,
+                    client_siret: f.client.siret,
+                    client_type: f.client.type,
+                    issuer: settings.issuer,
+                    issue_date: f.issue_date,
+                    validity_days: f.validity_days,
+                    object: f.object,
+                    deposit_percent: f.deposit_percent,
+                    micro: f.micro,
+                    notes: f.notes,
+                    parent_id: current?.parent_id ?? null,
+                    paid_at: f.status === 'paye' ? (current?.paid_at || today()) : null,
+                    updated_at: new Date().toISOString()
+                };
+                let docId = current?.id;
+                if (docId) {
+                    const { error } = await sb.from('documents').update(payload).eq('id', docId);
+                    if (error) throw error;
+                } else {
+                    const { data, error } = await sb.from('documents').insert(payload).select().single();
+                    if (error) throw error;
+                    docId = data.id;
+                }
+
+                // 4. Lignes : on remplace l'ensemble
+                const { error: delErr } = await sb.from('document_lines').delete().eq('document_id', docId);
+                if (delErr) throw delErr;
+                if (f.lines.length) {
+                    const rows = f.lines.map((l) => ({ ...l, document_id: docId }));
+                    const { error: insErr } = await sb.from('document_lines').insert(rows);
+                    if (insErr) throw insErr;
+                }
+
+                toast(`${number} enregistré`);
+                await loadAll();
+                openDocument(docId);
+            } catch (err) {
+                toast('Erreur : ' + (err.message || err), true);
+            } finally {
+                $('btn-save').disabled = false;
+                $('btn-save').textContent = 'Enregistrer';
+            }
+        }
+
+        // Créer une facture à partir d'un devis enregistré
+        $('btn-convert').addEventListener('click', async () => {
+            if (!current || current.kind !== 'devis') return;
+            if (!confirm(`Créer une facture à partir de ${current.number} ?`)) return;
+            const { data: num, error: numErr } = await sb.rpc('next_number', { kind_in: 'facture' });
+            if (numErr) return toast('Erreur : ' + numErr.message, true);
+            const lines = current.document_lines.map((l) => ({
+                position: l.position, description: l.description, quantity: l.quantity, unit: l.unit, unit_price: l.unit_price
+            }));
+            const { data: inv, error } = await sb.from('documents').insert({
+                kind: 'facture', number: num, status: 'envoye',
+                client_id: current.client_id, client_name: current.client_name, client_address: current.client_address,
+                client_email: current.client_email, client_phone: current.client_phone, client_siret: current.client_siret,
+                client_type: current.client_type, issuer: settings.issuer,
+                issue_date: today(), validity_days: 30, object: current.object,
+                deposit_percent: current.deposit_percent, micro: current.micro, notes: current.notes,
+                parent_id: current.id
+            }).select().single();
+            if (error) return toast('Erreur : ' + error.message, true);
+            const { error: lineErr } = await sb.from('document_lines').insert(lines.map((l) => ({ ...l, document_id: inv.id })));
+            if (lineErr) return toast('Erreur : ' + lineErr.message, true);
+            toast(`Facture ${num} créée`);
+            await loadAll();
+            openDocument(inv.id);
+        });
+
+        $('btn-print').addEventListener('click', () => { refreshPreview(); window.print(); });
+
+        // ===================== PARAMÈTRES =====================
+        function fillIssuerForm() {
+            const i = settings.issuer;
+            $('i-name').value = i.name || ''; $('i-brand').value = i.brand || ''; $('i-address').value = i.address || '';
+            $('i-email').value = i.email || ''; $('i-phone').value = i.phone || ''; $('i-siret').value = i.siret || '';
+        }
+
+        $('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const issuer = {
+                name: $('i-name').value, brand: $('i-brand').value, address: $('i-address').value,
+                email: $('i-email').value, phone: $('i-phone').value, siret: $('i-siret').value
+            };
+            const { error } = await sb.from('settings').update({ issuer }).eq('id', 1);
+            if (error) return toast('Erreur : ' + error.message, true);
+            settings.issuer = issuer;
+            toast('Coordonnées enregistrées');
+            refreshPreview();
+        });
+
+        // ===================== RENDU DU DOCUMENT =====================
+        function renderDoc(d) {
+            const lines = d.lines.filter((l) => l.description || l.unit_price);
+            const ht = lines.reduce((acc, l) => acc + l.quantity * l.unit_price, 0);
+            const vat = d.micro ? 0 : ht * 0.2;
+            const ttc = ht + vat;
+            const deposit = d.deposit_percent > 0 ? ttc * d.deposit_percent / 100 : 0;
+            const isInvoice = d.kind === 'facture';
+            const title = isInvoice ? 'Facture' : 'Devis';
+            const dateLabel = isInvoice ? "Date d'échéance" : "Valable jusqu'au";
+            const dateValue = addDays(d.issue_date, d.validity_days);
+            const i = d.issuer || DEFAULT_ISSUER;
+
+            const rows = lines.map((l, idx) => `
+                <tr class="border-b border-brand-plum/10">
+                    <td class="py-2.5 px-2 align-top text-center opacity-70">${idx + 1}</td>
+                    <td class="py-2.5 px-2 align-top whitespace-pre-line">${esc(l.description)}</td>
+                    <td class="py-2.5 px-2 align-top text-center">${esc(l.unit)}</td>
+                    <td class="py-2.5 px-2 align-top text-right">${l.quantity}</td>
+                    <td class="py-2.5 px-2 align-top text-right">${eur(l.unit_price)}</td>
+                    <td class="py-2.5 px-2 align-top text-right font-bold">${eur(l.quantity * l.unit_price)}</td>
+                </tr>`).join('');
+
+            $('doc').innerHTML = `
+                <div class="bg-brand-plum text-brand-cream px-10 py-7 flex items-center justify-between">
+                    <img src="../images/logo.png" alt="Velours & Vapeur" class="h-14 w-auto">
+                    <div class="text-right">
+                        <p class="text-[10px] uppercase tracking-[0.25em] opacity-70">${title}</p>
+                        <p class="text-xl font-black">${esc(d.number)}</p>
+                    </div>
+                </div>
+
+                <div class="px-10 pt-8 pb-10 space-y-8">
+                    <div class="grid grid-cols-2 gap-8">
+                        <div class="space-y-1">
+                            <p class="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-2">Émetteur</p>
+                            <p class="font-black text-sm">${esc(i.name)}</p>
+                            ${i.brand ? `<p>${esc(i.brand)}</p>` : ''}
+                            <p>${nl2br(i.address)}</p>
+                            ${i.email ? `<p>${esc(i.email)}</p>` : ''}
+                            ${i.phone ? `<p>${esc(i.phone)}</p>` : ''}
+                            ${i.siret ? `<p>SIRET : ${esc(i.siret)}</p>` : ''}
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-2">Client</p>
+                            <p class="font-black text-sm">${esc(d.client.name)}</p>
+                            <p>${nl2br(d.client.address)}</p>
+                            ${d.client.email ? `<p>${esc(d.client.email)}</p>` : ''}
+                            ${d.client.phone ? `<p>${esc(d.client.phone)}</p>` : ''}
+                            ${d.client.type === 'Professionnel' && d.client.siret ? `<p>SIRET : ${esc(d.client.siret)}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 bg-brand-cream rounded-xl p-4 text-[11px]">
+                        <div><p class="opacity-60 uppercase tracking-wider font-bold">Date</p><p class="font-bold text-sm mt-1">${fmtDate(d.issue_date)}</p></div>
+                        <div><p class="opacity-60 uppercase tracking-wider font-bold">${dateLabel}</p><p class="font-bold text-sm mt-1">${fmtDate(dateValue)}</p></div>
+                        <div><p class="opacity-60 uppercase tracking-wider font-bold">Conditions</p><p class="font-bold text-sm mt-1">${d.validity_days} jours</p></div>
+                    </div>
+
+                    ${d.object ? `<p class="text-base font-black">${esc(d.object)}</p>` : ''}
+
+                    <table class="w-full text-[11px]">
+                        <thead>
+                            <tr class="bg-brand-plum text-brand-cream">
+                                <th class="py-2 px-2 w-10 text-center font-bold">#</th>
+                                <th class="py-2 px-2 text-left font-bold">Désignation</th>
+                                <th class="py-2 px-2 text-center font-bold">Unité</th>
+                                <th class="py-2 px-2 text-right font-bold">Qté</th>
+                                <th class="py-2 px-2 text-right font-bold">P.U. HT</th>
+                                <th class="py-2 px-2 text-right font-bold">Montant HT</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows || `<tr><td colspan="6" class="py-6 text-center opacity-50">Aucune prestation</td></tr>`}</tbody>
+                    </table>
+
+                    <div class="grid grid-cols-2 gap-8 items-start">
+                        <div class="space-y-3 text-[11px]">
+                            ${d.notes ? `<div><p class="font-bold uppercase tracking-wider opacity-60 mb-1">Notes</p><p class="whitespace-pre-line">${esc(d.notes)}</p></div>` : ''}
+                            <div>
+                                <p class="font-bold uppercase tracking-wider opacity-60 mb-1">Conditions</p>
+                                ${isInvoice
+                                    ? `<p>Paiement à réception ou à la date d'échéance indiquée.</p>`
+                                    : `<p>Devis valable ${d.validity_days} jours à compter de sa date d'émission.</p>`}
+                                ${d.deposit_percent > 0 ? `<p>Acompte à la commande : ${d.deposit_percent} % soit ${eur(deposit)}.</p>` : ''}
+                                <p>Pénalités de retard : 3 fois le taux d'intérêt légal.</p>
+                                <p>Indemnité forfaitaire pour frais de recouvrement : 40 €.</p>
+                                <p>Pas d'escompte en cas de paiement anticipé.</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between py-1.5 border-b border-brand-plum/10"><span>Total HT</span><span class="font-bold">${eur(ht)}</span></div>
+                            ${d.micro
+                                ? `<p class="text-[10px] opacity-70">TVA non applicable, art. 293 B du CGI.</p>`
+                                : `<div class="flex justify-between py-1.5 border-b border-brand-plum/10"><span>TVA (20 %)</span><span>${eur(vat)}</span></div>`}
+                            <div class="flex justify-between py-2.5 px-3 mt-2 rounded-xl bg-brand-plum text-brand-cream font-black"><span>Total TTC</span><span>${eur(ttc)}</span></div>
+                            ${deposit > 0 ? `<div class="flex justify-between py-1.5 text-xs"><span>Acompte à verser</span><span class="font-bold">${eur(deposit)}</span></div>` : ''}
+                        </div>
+                    </div>
+
+                    ${!isInvoice ? `
+                    <div class="grid grid-cols-2 gap-8 pt-6 text-[11px]">
+                        <div class="border border-brand-plum/20 rounded-xl p-4 h-28">
+                            <p class="font-bold">Bon pour accord</p>
+                            <p class="opacity-60 mt-1">Date et signature du client, précédées de la mention « Lu et approuvé »</p>
+                        </div>
+                        <div class="text-right text-[10px] opacity-60 self-end">Merci de votre confiance !</div>
+                    </div>` : ''}
+                </div>
+
+                <div class="bg-brand-plumDark text-brand-cream/70 text-[9px] text-center py-3">
+                    ${esc(i.name)}${i.brand ? ' · ' + esc(i.brand) : ''}${i.siret ? ' · SIRET ' + esc(i.siret) : ''}
+                </div>`;
+        }
+
+        // ===================== DÉMARRAGE =====================
+        (async () => {
+            const { data } = await sb.auth.getSession();
+            if (data.session) {
+                await showApp();
+            } else {
+                $('login').classList.remove('hidden');
+            }
+        })();
+    </script>
+</body>
+</html>
