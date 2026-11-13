@@ -11,7 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -68,6 +69,11 @@
         .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         #pdf-stage { position: fixed; left: 0; top: 0; width: 210mm; background: #fff; opacity: 0; pointer-events: none; z-index: -1; overflow: hidden; }
         #pdf-stage .doc-page { height: 296mm; min-height: 0; overflow: hidden; }
+        /* Version compacte pour tenir sur une seule page A4 */
+        #pdf-stage .doc-head { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+        #pdf-stage .doc-body { padding-top: 1.25rem !important; padding-bottom: 1rem !important; gap: 1.1rem !important; }
+        #pdf-stage .doc-footer { padding-top: .6rem; padding-bottom: .6rem; }
+        #pdf-stage table td, #pdf-stage table th { padding-top: .35rem !important; padding-bottom: .35rem !important; }
         .modal-enter { animation: modalIn .25s cubic-bezier(.22,.8,.24,1) both; }
         @keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
         .fade-in { animation: fadeIn .35s ease both; }
@@ -131,7 +137,7 @@
             <!-- TABLEAU DE BORD -->
             <section id="tab-dashboard" class="space-y-6 fade-in">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-black">Bonjour 👋</h2>
+                    <h2 id="greeting" class="text-xl sm:text-2xl font-black">Bonjour</h2>
                     <p class="text-sm opacity-65">Voici l'état de votre activité.</p>
                 </div>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -477,6 +483,7 @@
             clients = c.data;
             documents = d.data.map((doc) => ({ ...doc, document_lines: (doc.document_lines || []).sort((a, b) => a.position - b.position) }));
             fillIssuerForm();
+            $('greeting').textContent = 'Bonjour ' + (settings.issuer.name || '');
             fillClientSelect();
             renderDashboard();
             renderClients();
@@ -947,14 +954,20 @@
                 const number = f.number || current?.number || 'document';
                 $('pdf-stage').innerHTML = `<div class="doc-page">${$('doc').innerHTML}</div>`;
                 const el = $('pdf-stage').firstElementChild;
-                await html2pdf().set({
-                    margin: 0,
-                    filename: `${number}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 794, scrollX: 0, scrollY: 0, x: 0, y: 0 },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['avoid-all'] }
-                }).from(el).save();
+                // Capture du document puis insertion dans UNE page A4 (pas de découpage automatique)
+                const canvas = await html2canvas(el, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    width: el.offsetWidth,
+                    height: el.offsetHeight,
+                    windowWidth: el.offsetWidth,
+                    scrollX: 0,
+                    scrollY: 0
+                });
+                const pdf = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 210, 296, undefined, 'FAST');
+                pdf.save(`${number}.pdf`);
             } catch (err) {
                 toast('Erreur PDF : ' + err.message, true);
                 console.error(err);
