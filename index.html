@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Velours & Vapeur : nettoyage écologique de matelas, canapés, tapis et intérieurs de véhicules à domicile dans les Pyrénées-Orientales (66).">
+    <meta name="theme-color" content="#4a1531">
+    <title>Velours & Vapeur | Nettoyage Écologique de Textiles (66)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            plum: '#4a1531',
+                            plumDark: '#2d0c1d',
+                            plumLight: '#73234d',
+                            cream: '#fcfaf8',
+                            beige: '#f0e8df',
+                        }
+                    },
+                    boxShadow: {
+                        soft: '0 20px 50px -28px rgba(74, 21, 49, .28)',
+                        lift: '0 34px 60px -28px rgba(74, 21, 49, .38)',
+                    },
+                    keyframes: {
+                        float: { '0%,100%': { transform: 'translate(0,0) scale(1)' }, '50%': { transform: 'translate(24px,-32px) scale(1.07)' } },
+                        fadeUp: { from: { opacity: '0', transform: 'translateY(26px)' }, to: { opacity: '1', transform: 'none' } },
+                        bounceY: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(6px)' } },
+                        ping: { '0%': { boxShadow: '0 0 0 0 rgba(74,21,49,.45)' }, '70%,100%': { boxShadow: '0 0 0 8px rgba(74,21,49,0)' } },
+                    },
+                    animation: {
+                        float: 'float 16s ease-in-out infinite',
+                        fadeUp: 'fadeUp 1s cubic-bezier(.22,.8,.24,1) both',
+                        bounceY: 'bounceY 2.4s ease-in-out infinite',
+                        pulseDot: 'ping 2s infinite',
+                    },
+                    transitionTimingFunction: { soft: 'cubic-bezier(.22,.8,.24,1)' },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+        section { scroll-margin-top: 80px; }
+        ::selection { background: #4a1531; color: #fcfaf8; }
+        :focus-visible { outline: 2px solid #73234d; outline-offset: 3px; border-radius: 8px; }
+        .lucide { width: 18px; height: 18px; stroke-width: 2; flex-shrink: 0; }
+
+        /* Scroll reveal */
+        .js .reveal { opacity: 0; transform: translateY(34px); transition: opacity 1s cubic-bezier(.22,.8,.24,1), transform 1s cubic-bezier(.22,.8,.24,1); transition-delay: var(--d, 0s); }
+        .js .reveal.in { opacity: 1; transform: none; }
+
+        /* Hero entrance delays */
+        .d1 { animation-delay: .1s; } .d2 { animation-delay: .22s; } .d3 { animation-delay: .34s; } .d4 { animation-delay: .46s; }
+
+        /* Menu burger -> croix */
+        .menu-btn[aria-expanded="true"] .bar1 { transform: translateY(7px) rotate(45deg); }
+        .menu-btn[aria-expanded="true"] .bar2 { transform: translateY(-7px) rotate(-45deg); }
+        .mobile-menu { max-height: 0; overflow: hidden; transition: max-height .6s cubic-bezier(.22,.8,.24,1); }
+        .mobile-menu.open { max-height: 600px; }
+        .mobile-menu .m-link { opacity: 0; transform: translateX(-12px); transition: opacity .5s, transform .5s cubic-bezier(.22,.8,.24,1), color .3s; }
+        .mobile-menu.open .m-link { opacity: 1; transform: none; }
+        .mobile-menu.open .m-link:nth-child(1) { transition-delay: .05s; }
+        .mobile-menu.open .m-link:nth-child(2) { transition-delay: .1s; }
+        .mobile-menu.open .m-link:nth-child(3) { transition-delay: .15s; }
+        .mobile-menu.open .m-link:nth-child(4) { transition-delay: .2s; }
+        .mobile-menu.open .m-link:nth-child(5) { transition-delay: .25s; }
+
+        /* Liens soulignés animés */
+        .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; border-radius: 2px; background: #f0e8df; transform: scaleX(0); transform-origin: right; transition: transform .45s cubic-bezier(.22,.8,.24,1); }
+        .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+
+        /* Comparateur avant / après */
+        .ba { --pos: 50%; }
+        .ba-before { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+        .ba-handle { left: var(--pos); }
+
+        /* Cartes */
+        .lift { transition: opacity 1s cubic-bezier(.22,.8,.24,1), transform .6s cubic-bezier(.22,.8,.24,1), box-shadow .6s, background-color .5s, border-color .5s; }
+        .js .lift.reveal { transition-delay: var(--d, 0s), 0s, 0s, 0s, 0s; }
+        .lift:hover { transform: translateY(-8px); }
+        .media-zoom img { transition: transform 1.4s cubic-bezier(.22,.8,.24,1); }
+        .group:hover .media-zoom img { transform: scale(1.07); }
+        .group:hover .icon-dot { transform: rotate(-6deg) scale(1.05); background: #4a1531; color: #fcfaf8; }
+        .icon-dot { transition: transform .5s cubic-bezier(.22,.8,.24,1), background-color .4s, color .4s; }
+        .arrow-go { transition: transform .4s cubic-bezier(.22,.8,.24,1); }
+        .group:hover .arrow-go { transform: translateX(5px); }
+
+        .hero-accent { background: linear-gradient(115deg, #4a1531 10%, #73234d 55%, #b4628c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+        .stars .lucide { fill: currentColor; width: 17px; height: 17px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+            .js .reveal { opacity: 1; transform: none; }
+        }
+    </style>
+</head>
+
+<body class="bg-brand-cream text-brand-plum font-sans antialiased selection:bg-brand-plum selection:text-brand-cream overflow-x-hidden tracking-tight">
+
+    <!-- BANDEAU -->
+    <div class="bg-brand-cream text-brand-plum border-b border-brand-plum/10 py-2 px-3 text-center text-[11px] sm:text-xs font-medium">
+        <span class="inline-flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-plum animate-pulseDot"></span>
+            <span class="opacity-90">Intervention à domicile &amp; sur site</span>
+            <span class="opacity-50">•</span>
+            <span class="font-bold">Pyrénées-Orientales (66)</span>
+        </span>
+    </div>
+
+    <!-- HEADER -->
+    <header id="site-header" class="sticky top-0 z-50 bg-brand-plum/95 backdrop-blur-md text-brand-cream border-b border-white/10 transition-shadow duration-500">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+            <a href="#" class="block" aria-label="Velours & Vapeur, accueil">
+                <img src="images/logo.png" alt="Logo Velours & Vapeur" class="h-8 sm:h-10 w-auto object-contain transition-transform duration-500 hover:scale-105">
+            </a>
+
+            <nav class="hidden md:flex items-center gap-8 text-xs font-bold tracking-wide text-brand-cream/80" aria-label="Navigation principale">
+                <a href="#prestations" class="nav-link relative py-1 hover:text-white transition-colors">Prestations</a>
+                <a href="#methode" class="nav-link relative py-1 hover:text-white transition-colors">Méthode</a>
+                <a href="#offres" class="nav-link relative py-1 hover:text-white transition-colors">Solutions</a>
+                <a href="#guillaume" class="nav-link relative py-1 hover:text-white transition-colors">À propos</a>
+                <a href="#avis" class="nav-link relative py-1 hover:text-white transition-colors">Avis</a>
+                <a href="demande-devis.html" class="inline-flex items-center gap-1.5 bg-brand-cream text-brand-plum px-5 py-2.5 rounded-full hover:bg-brand-beige hover:-translate-y-0.5 transition-all shadow-md">
+                    <span>Devis gratuit</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </nav>
+
+            <button id="menu-btn" class="md:hidden w-10 h-10 rounded-full bg-white/10 border border-white/20 flex flex-col items-center justify-center gap-[5px] menu-btn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
+                <span class="bar1 block w-4 h-0.5 bg-brand-cream rounded transition-transform duration-500"></span>
+                <span class="bar2 block w-4 h-0.5 bg-brand-cream rounded transition-transform duration-500"></span>
+            </button>
+        </div>
+
+        <nav id="mobile-menu" class="mobile-menu md:hidden bg-brand-plum border-t border-white/10" aria-label="Navigation mobile">
+            <div class="px-6 pt-2 pb-7 flex flex-col">
+                <a href="#prestations" class="m-link flex justify-between items-center py-3.5 text-sm font-bold text-brand-cream/85 border-b border-white/10">Prestations <i data-lucide="chevron-right" class="w-4 h-4"></i></a>
+                <a href="#methode" class="m-link flex justify-between items-center py-3.5 text-sm font-bold text-brand-cream/85 border-b border-white/10">Méthode <i data-lucide="chevron-right" class="w-4 h-4"></i></a>
+                <a href="#offres" class="m-link flex justify-between items-center py-3.5 text-sm font-bold text-brand-cream/85 border-b border-white/10">Professionnels &amp; Particuliers <i data-lucide="chevron-right" class="w-4 h-4"></i></a>
+                <a href="#guillaume" class="m-link flex justify-between items-center py-3.5 text-sm font-bold text-brand-cream/85 border-b border-white/10">À propos de Guillaume <i data-lucide="chevron-right" class="w-4 h-4"></i></a>
+                <a href="#avis" class="m-link flex justify-between items-center py-3.5 text-sm font-bold text-brand-cream/85 border-b border-white/10">Avis Clients <i data-lucide="chevron-right" class="w-4 h-4"></i></a>
+                <a href="demande-devis.html" class="mt-5 inline-flex items-center justify-center gap-2 bg-brand-cream text-brand-plum py-3.5 rounded-full font-bold text-xs uppercase tracking-wider shadow-md hover:bg-brand-beige">
+                    Prendre rendez-vous
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <section class="relative overflow-hidden bg-brand-cream pt-14 pb-20 sm:pt-24 sm:pb-28 px-4 sm:px-6">
+            <div class="absolute inset-0 pointer-events-none opacity-70" style="background: radial-gradient(900px 500px at 90% -10%, rgba(115,35,77,.14), transparent 60%), radial-gradient(800px 500px at -10% 110%, #f0e8df, transparent 60%);"></div>
+            <div class="absolute inset-0 pointer-events-none" style="background-image: radial-gradient(rgba(74,21,49,.07) 1px, transparent 1px); background-size: 22px 22px; mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);"></div>
+            <div class="absolute -top-36 -right-24 w-[360px] h-[360px] rounded-full bg-[#d8b3c6] opacity-50 blur-3xl animate-float pointer-events-none"></div>
+            <div class="absolute -bottom-32 -left-20 w-[300px] h-[300px] rounded-full bg-[#e7d3c2] opacity-60 blur-3xl animate-float pointer-events-none" style="animation-delay:-7s"></div>
+
+            <div class="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center gap-6">
+                <p class="animate-fadeUp inline-flex items-center gap-3 text-[11px] sm:text-xs font-black uppercase tracking-[0.2em] text-brand-plumLight">
+                    <span class="w-7 h-0.5 bg-current rounded"></span>
+                    Matelas – Mobilier textile – Intérieur véhicule
+                </p>
+
+                <h1 class="animate-fadeUp d1 text-[2.35rem] sm:text-6xl md:text-7xl font-black leading-[1.04] tracking-[-0.04em] max-w-[15ch] text-balance">
+                    Nettoyage écologique de textiles
+                    <span class="block hero-accent pb-1">dans les Pyrénées-Orientales</span>
+                </h1>
+
+                <p class="animate-fadeUp d2 max-w-2xl text-sm sm:text-base md:text-lg font-medium text-brand-plum/80 leading-relaxed">
+                    Chez Velours et Vapeur, nous sublimons vos textiles avec un <strong class="text-brand-plum font-bold">nettoyage écologique</strong> haut de gamme, à Perpignan et dans les Pyrénées-Orientales. <strong class="text-brand-plum font-bold">Canapés, matelas, véhicules</strong>, tapis ou moquettes : nous éliminons en profondeur taches, odeurs, bactéries et acariens grâce au <strong class="text-brand-plum font-bold">nettoyage par l’injection-extraction</strong> et à la <strong class="text-brand-plum font-bold">désinfection vapeur</strong> haute température, sans produits agressifs. Nous intervenons <strong class="text-brand-plum font-bold">à domicile</strong> pour particuliers et professionnels, et toujours avec le sourire !
+                </p>
+
+                <div class="animate-fadeUp d3 flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full sm:w-auto">
+                    <a href="demande-devis.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand-plum text-brand-cream px-8 py-4 rounded-full font-bold text-xs uppercase tracking-wider shadow-lg shadow-brand-plum/30 hover:bg-brand-plumLight hover:-translate-y-0.5 transition-all">
+                        <span>Prendre rendez-vous</span>
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                    </a>
+                    <a href="#prestations" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-brand-plum border border-brand-plum/20 hover:bg-brand-beige px-6 py-3.5 rounded-full font-bold text-xs transition-colors">
+                        <span>Découvrir la méthode</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </a>
+                </div>
+
+                <ul class="animate-fadeUp d4 w-full max-w-xl mt-8 pt-6 grid grid-cols-3 border-t border-brand-plum/10">
+                    <li class="px-2 text-center">
+                        <p class="text-lg sm:text-2xl font-black tracking-tight">100%</p>
+                        <p class="mt-0.5 text-[9px] sm:text-[11px] font-extrabold uppercase tracking-[0.14em] opacity-65">Écologique</p>
+                    </li>
+                    <li class="px-2 text-center border-x border-brand-plum/10">
+                        <p class="text-lg sm:text-2xl font-black tracking-tight">Haute T°</p>
+                        <p class="mt-0.5 text-[9px] sm:text-[11px] font-extrabold uppercase tracking-[0.14em] opacity-65">Désinfection</p>
+                    </li>
+                    <li class="px-2 text-center">
+                        <p class="text-lg sm:text-2xl font-black tracking-tight">À Domicile</p>
+                        <p class="mt-0.5 text-[9px] sm:text-[11px] font-extrabold uppercase tracking-[0.14em] opacity-65">Sur site (66)</p>
+                    </li>
+                </ul>
+            </div>
+
+            <a href="#prestations" class="hidden lg:block absolute left-1/2 -translate-x-1/2 bottom-5 text-brand-plum/50 animate-bounceY" aria-label="Défiler vers les prestations">
+                <i data-lucide="chevron-down" class="w-6 h-6"></i>
+            </a>
+        </section>
+
+        <!-- PRESTATIONS -->
+        <section id="prestations" class="relative py-20 sm:py-28 bg-gradient-to-b from-brand-plum to-brand-plumDark text-brand-cream overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-brand-plumLight/40 blur-3xl pointer-events-none"></div>
+
+            <div class="relative max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="reveal text-center max-w-3xl mx-auto">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-beige">Savoir-faire</p>
+                    <h2 class="mt-3 text-3xl sm:text-5xl font-black leading-[1.1] tracking-tight text-balance">Un nettoyage professionnel de vos mobiliers textiles et intérieurs de véhicules</h2>
+                </div>
+
+                <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7">
+                    <!-- Matelas -->
+                    <article class="reveal lift group flex flex-col p-3 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 hover:border-brand-beige/30 hover:shadow-2xl hover:shadow-black/40" style="--d:0s">
+                        <div class="ba relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#1b0712] isolate">
+                            <img src="images/matelas/apres/matelas-1.jpg" alt="Matelas après nettoyage" class="absolute inset-0 w-full h-full object-cover select-none" loading="lazy">
+                            <img src="images/matelas/avant/matelas-1.png" alt="Matelas avant nettoyage" class="ba-before absolute inset-0 w-full h-full object-cover select-none" loading="lazy">
+                            <span class="absolute top-3 left-3 z-[2] text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand-cream/95 text-brand-plum pointer-events-none">Avant</span>
+                            <span class="absolute top-3 right-3 z-[2] text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand-plum/85 text-brand-cream border border-white/25 pointer-events-none">Après</span>
+                            <div class="ba-handle absolute top-0 bottom-0 w-0.5 -ml-px bg-white shadow-[0_0_14px_rgba(0,0,0,.35)] pointer-events-none z-[2]">
+                                <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-brand-plum grid place-items-center shadow-lg group-hover:scale-110 transition-transform duration-300"><i data-lucide="chevrons-left-right" class="w-4 h-4"></i></span>
+                            </div>
+                            <input type="range" min="0" max="100" value="50" aria-label="Comparer le matelas avant et après" class="ba-range absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-[3] m-0">
+                            <span class="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-[2] text-[10px] font-bold tracking-wide px-3 py-1 rounded-full bg-brand-plumDark/60 text-white whitespace-nowrap pointer-events-none">Glissez pour comparer</span>
+                        </div>
+                        <div class="flex flex-col gap-2.5 px-3 pt-5 pb-3 flex-1">
+                            <span class="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-brand-beige"><i data-lucide="bed" class="w-4 h-4"></i>Literie</span>
+                            <h3 class="text-xl font-extrabold tracking-tight">Matelas</h3>
+                            <p class="text-sm text-brand-cream/70 leading-relaxed">Élimination des auréoles, transpirations et acariens en profondeur.</p>
+                            <a href="demande-devis.html" class="mt-auto pt-3 inline-flex items-center gap-2 text-sm font-bold">En savoir plus <i data-lucide="arrow-right" class="arrow-go w-4 h-4"></i></a>
+                        </div>
+                    </article>
+
+                    <!-- Textile -->
+                    <article class="reveal lift group flex flex-col p-3 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 hover:border-brand-beige/30 hover:shadow-2xl hover:shadow-black/40" style="--d:.12s">
+                        <div class="ba relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#1b0712] isolate">
+                            <img src="images/textile/apres/textile-1.png" alt="Textile après nettoyage" class="absolute inset-0 w-full h-full object-cover select-none" loading="lazy">
+                            <img src="images/textile/avant/textile-1.png" alt="Textile avant nettoyage" class="ba-before absolute inset-0 w-full h-full object-cover select-none" loading="lazy">
+                            <span class="absolute top-3 left-3 z-[2] text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand-cream/95 text-brand-plum pointer-events-none">Avant</span>
+                            <span class="absolute top-3 right-3 z-[2] text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand-plum/85 text-brand-cream border border-white/25 pointer-events-none">Après</span>
+                            <div class="ba-handle absolute top-0 bottom-0 w-0.5 -ml-px bg-white shadow-[0_0_14px_rgba(0,0,0,.35)] pointer-events-none z-[2]">
+                                <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-brand-plum grid place-items-center shadow-lg group-hover:scale-110 transition-transform duration-300"><i data-lucide="chevrons-left-right" class="w-4 h-4"></i></span>
+                            </div>
+                            <input type="range" min="0" max="100" value="50" aria-label="Comparer le textile avant et après" class="ba-range absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-[3] m-0">
+                        </div>
+                        <div class="flex flex-col gap-2.5 px-3 pt-5 pb-3 flex-1">
+                            <span class="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-brand-beige"><i data-lucide="armchair" class="w-4 h-4"></i>Mobilier</span>
+                            <h3 class="text-xl font-extrabold tracking-tight">Textiles d'ameublement</h3>
+                            <p class="text-sm text-brand-cream/70 leading-relaxed">Canapés, fauteuils, tapis et moquettes rafraîchis et assainis.</p>
+                            <a href="demande-devis.html" class="mt-auto pt-3 inline-flex items-center gap-2 text-sm font-bold">En savoir plus <i data-lucide="arrow-right" class="arrow-go w-4 h-4"></i></a>
+                        </div>
+                    </article>
+
+                    <!-- Véhicule -->
+                    <article class="reveal lift group flex flex-col p-3 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 hover:border-brand-beige/30 hover:shadow-2xl hover:shadow-black/40" style="--d:.24s">
+                        <div class="ba relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#1b0712] isolate">
+                            <img src="images/voiture/apres/voiture-1.png" alt="Véhicule après nettoyage" class="absolute inset-0 w-full h-full object-cover select-none" loading="lazy">
+                            <img src="images/voiture/avant/voiture-1.png" alt="Véhicule avant nettoyage" class="ba-before absolute inset-0 w-full h-full object-cover select-none" loading="lazy">
+                            <span class="absolute top-3 left-3 z-[2] text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand-cream/95 text-brand-plum pointer-events-none">Avant</span>
+                            <span class="absolute top-3 right-3 z-[2] text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand-plum/85 text-brand-cream border border-white/25 pointer-events-none">Après</span>
+                            <div class="ba-handle absolute top-0 bottom-0 w-0.5 -ml-px bg-white shadow-[0_0_14px_rgba(0,0,0,.35)] pointer-events-none z-[2]">
+                                <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-brand-plum grid place-items-center shadow-lg group-hover:scale-110 transition-transform duration-300"><i data-lucide="chevrons-left-right" class="w-4 h-4"></i></span>
+                            </div>
+                            <input type="range" min="0" max="100" value="50" aria-label="Comparer l'habitacle avant et après" class="ba-range absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-[3] m-0">
+                        </div>
+                        <div class="flex flex-col gap-2.5 px-3 pt-5 pb-3 flex-1">
+                            <span class="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-brand-beige"><i data-lucide="car" class="w-4 h-4"></i>Automobile</span>
+                            <h3 class="text-xl font-extrabold tracking-tight">Intérieurs de véhicules</h3>
+                            <p class="text-sm text-brand-cream/70 leading-relaxed">Sièges, moquettes et habitacles remis à neuf sans effort.</p>
+                            <a href="demande-devis.html" class="mt-auto pt-3 inline-flex items-center gap-2 text-sm font-bold">En savoir plus <i data-lucide="arrow-right" class="arrow-go w-4 h-4"></i></a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- METHODE -->
+        <section id="methode" class="py-20 sm:py-28 bg-brand-cream">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="reveal text-center max-w-3xl mx-auto">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-plumLight">Notre procédé</p>
+                    <h2 class="mt-3 text-3xl sm:text-5xl font-black leading-[1.1] tracking-tight text-balance">Le nettoyage textile écologique par Velours &amp; Vapeur</h2>
+                </div>
+
+                <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                    <article class="reveal lift group flex flex-col justify-between gap-8 p-7 sm:p-10 rounded-[28px] sm:rounded-[32px] bg-white border border-brand-plum/5 shadow-soft hover:shadow-lift" style="--d:0s">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-plumLight">Technologie 1</span>
+                            <h3 class="mt-2 text-2xl font-extrabold tracking-tight leading-snug">Le nettoyage textile par Injection – Extraction</h3>
+                            <ul class="mt-6 grid gap-3.5 text-sm font-medium text-brand-plum/85">
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="droplet" class="w-4 h-4"></i></span><span class="pt-1">Aspiration des poussières, allergènes et impuretés</span></li>
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="droplet" class="w-4 h-4"></i></span><span class="pt-1">Élimination des résidus corporels et transpiration</span></li>
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="droplet" class="w-4 h-4"></i></span><span class="pt-1">Réduction des auréoles &amp; taches</span></li>
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="droplet" class="w-4 h-4"></i></span><span class="pt-1">Élimination des particules fines et résidus invisibles</span></li>
+                            </ul>
+                        </div>
+                        <div class="media-zoom relative h-48 sm:h-64 rounded-2xl overflow-hidden border border-brand-plum/5">
+                            <img src="images/injection.png" alt="Nettoyage par injection-extraction" class="w-full h-full object-cover" loading="lazy">
+                        </div>
+                    </article>
+
+                    <article class="reveal lift group flex flex-col justify-between gap-8 p-7 sm:p-10 rounded-[28px] sm:rounded-[32px] bg-white border border-brand-plum/5 shadow-soft hover:shadow-lift" style="--d:.15s">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-plumLight">Technologie 2</span>
+                            <h3 class="mt-2 text-2xl font-extrabold tracking-tight leading-snug">La désinfection Vapeur haute pression</h3>
+                            <ul class="mt-6 grid gap-3.5 text-sm font-medium text-brand-plum/85">
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="wind" class="w-4 h-4"></i></span><span class="pt-1">Élimination des bactéries</span></li>
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="wind" class="w-4 h-4"></i></span><span class="pt-1">Réduction drastique des acariens</span></li>
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="wind" class="w-4 h-4"></i></span><span class="pt-1">Neutralisation des mauvaises odeurs</span></li>
+                                <li class="flex items-start gap-3.5"><span class="icon-dot w-8 h-8 rounded-lg bg-brand-beige text-brand-plum grid place-items-center shrink-0"><i data-lucide="wind" class="w-4 h-4"></i></span><span class="pt-1">Assainissement sans produits agressifs</span></li>
+                            </ul>
+                        </div>
+                        <div class="media-zoom relative h-48 sm:h-64 rounded-2xl overflow-hidden border border-brand-plum/5">
+                            <img src="images/vapeur.jpg" alt="Désinfection vapeur" class="w-full h-full object-cover" loading="lazy">
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- OFFRES -->
+        <section id="offres" class="py-20 sm:py-28 bg-gradient-to-b from-brand-beige to-[#f7f1ea] border-t border-brand-plum/5">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="reveal text-center max-w-4xl mx-auto">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-plumLight">Nos offres</p>
+                    <h2 class="mt-3 text-3xl sm:text-5xl font-black leading-[1.1] tracking-tight text-balance">Nettoyage de matelas, mobilier et intérieur véhicules pour professionnels...</h2>
+                </div>
+
+                <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                    <article class="reveal lift flex flex-col gap-6 p-7 sm:p-12 rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-brand-plum to-brand-plumDark text-brand-cream shadow-lift" style="--d:0s">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-beige">Offre Pro</span>
+                            <h3 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight">... pour professionnels...</h3>
+                        </div>
+                        <div class="flex flex-col gap-4 text-sm font-medium leading-relaxed text-brand-cream/85">
+                            <p>Professionnels de Perpignan et des Pyrénées-Orientales, Velours et Vapeur prend soin de vos <strong class="text-white font-bold">textiles d'ameublement</strong> et de vos <strong class="text-white font-bold">véhicules</strong> avec un <strong class="text-white font-bold">nettoyage écologique</strong> haut de gamme. Nous intervenons pour les hôtels, restaurants, locations courte durée, campings, cinémas, auto-écoles, garages, concessions, flottes de véhicules, centres de loisirs ou encore dans des salles d’attente.</p>
+                            <p><strong class="text-white font-bold">Canapés, matelas, tapis, moquettes</strong> ou <strong class="text-white font-bold">intérieurs de véhicules</strong> : nous éliminons en profondeur taches, odeurs, bactéries et acariens en combinant <strong class="text-white font-bold">nettoyage de textiles par injection-extraction</strong> et <strong class="text-white font-bold">désinfection vapeur</strong> haute température, pour un nettoyage profond, respectueux de la santé, de vos matériaux... et de l'environnement !</p>
+                            <p>Faire appel à Velours et Vapeur, c'est valoriser votre image de marque, offrir une expérience client impeccable, encourager des retours positifs et fidéliser vos clients, tout en préservant vos investissements mobilier et véhicule.</p>
+                            <p class="font-bold italic text-brand-beige">Une solution professionnelle, écologique et durable qui allie performance, hygiène et élégance !</p>
+                        </div>
+                        <a href="demande-devis.html" class="mt-auto self-start inline-flex items-center gap-2 font-bold text-sm border-b-2 border-brand-beige/40 pb-1 hover:border-brand-beige hover:gap-3 transition-all">En savoir plus <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+                    </article>
+
+                    <article class="reveal lift flex flex-col gap-6 p-7 sm:p-12 rounded-[28px] sm:rounded-[32px] bg-white border border-brand-plum/5 shadow-soft hover:shadow-lift" style="--d:.15s">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-plumLight">Offre Particuliers</span>
+                            <h3 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight">... et particuliers !</h3>
+                        </div>
+                        <div class="flex flex-col gap-4 text-sm font-medium leading-relaxed text-brand-plum/80">
+                            <p>Vous souhaitez un <strong class="text-brand-plum font-bold">nettoyage de canapé</strong>, un <strong class="text-brand-plum font-bold">entretien de vos matelas</strong> ou une <strong class="text-brand-plum font-bold">remise en état de l'intérieur de votre véhicule</strong> ? Pour les particuliers à Perpignan et dans les Pyrénées-Orientales, Velours et Vapeur intervient directement chez vous pour un <strong class="text-brand-plum font-bold">nettoyage à domicile</strong> de tous vos textiles !</p>
+                            <p>Fauteuil, literie, tapis ou habitacle de véhicules : nous éliminons taches, odeurs, bactéries et acariens grâce à un <strong class="text-brand-plum font-bold">nettoyage injection-extraction</strong> et une <strong class="text-brand-plum font-bold">désinfection vapeur</strong>, sans produits agressifs.</p>
+                            <p class="font-bold text-brand-plum">Profitez d'un intérieur sain et confortable, prolongez la vie de vos meubles et véhicules, et laissez-nous apporter bonheur et légèreté à votre quotidien, sans que vous ayez à bouger !</p>
+                        </div>
+                        <a href="demande-devis.html" class="mt-auto self-start inline-flex items-center gap-2 font-bold text-sm border-b-2 border-brand-plum/20 pb-1 hover:border-brand-plum hover:gap-3 transition-all">En savoir plus <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+                    </article>
+                </div>
+
+                <div class="reveal mt-10 sm:mt-14 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-8 border-t border-brand-plum/10">
+                    <div class="lift flex items-center justify-center gap-2.5 p-4 rounded-2xl bg-white/80 border border-brand-plum/10 text-xs font-extrabold uppercase tracking-[0.12em] hover:-translate-y-1 hover:bg-brand-plum hover:text-brand-cream group"><i data-lucide="leaf" class="w-4 h-4 text-brand-plumLight group-hover:text-brand-beige"></i>Nettoyage écologique</div>
+                    <div class="lift flex items-center justify-center gap-2.5 p-4 rounded-2xl bg-white/80 border border-brand-plum/10 text-xs font-extrabold uppercase tracking-[0.12em] hover:-translate-y-1 hover:bg-brand-plum hover:text-brand-cream group"><i data-lucide="layers" class="w-4 h-4 text-brand-plumLight group-hover:text-brand-beige"></i>Au cœur des fibres</div>
+                    <div class="lift flex items-center justify-center gap-2.5 p-4 rounded-2xl bg-white/80 border border-brand-plum/10 text-xs font-extrabold uppercase tracking-[0.12em] hover:-translate-y-1 hover:bg-brand-plum hover:text-brand-cream group"><i data-lucide="home" class="w-4 h-4 text-brand-plumLight group-hover:text-brand-beige"></i>À domicile ou sur site</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- A PROPOS -->
+        <section id="guillaume" class="relative overflow-hidden py-20 sm:py-28 bg-brand-plum text-brand-cream">
+            <div class="absolute -top-44 -left-44 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,rgba(240,232,223,.12),transparent_65%)] pointer-events-none"></div>
+            <div class="relative max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+                <div class="reveal lg:col-span-5 w-full max-w-sm sm:max-w-md mx-auto" style="--d:0s">
+                    <div class="relative">
+                        <div class="absolute inset-0 translate-x-4 translate-y-4 rounded-[32px] border border-brand-beige/35 pointer-events-none hidden sm:block"></div>
+                        <div class="relative aspect-[4/5] rounded-[28px] overflow-hidden border border-white/10 shadow-2xl shadow-black/50 bg-white/5 group">
+                            <img src="images/1.png" alt="Guillaume, fondateur de Velours & Vapeur" class="w-full h-full object-cover object-top transition-transform duration-[1200ms] ease-soft group-hover:scale-105" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reveal lg:col-span-7 text-center lg:text-left" style="--d:.15s">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-beige">Fondateur &amp; artisan</p>
+                    <h2 class="mt-3 text-3xl sm:text-5xl font-black leading-[1.1] tracking-tight text-balance">L'art du nettoyage textile par Guillaume !</h2>
+
+                    <div class="mt-7 flex flex-col gap-4 text-sm sm:text-base leading-relaxed text-brand-cream/80">
+                        <p>Moi, c'est Guillaume. Beaucoup d'idées, plein de convictions et une bonne dose de motivation, mais surtout le sens du service, la sympathie, la bonne humeur, et la volonté profonde de remettre l'humain au cœur de notre quotidien !</p>
+                        <p class="text-base sm:text-lg font-bold text-brand-cream">Perpignan, c'est ma ville : j'y ai grandi, étudié, me suis formé, et aujourd'hui j'y ai fondé Velours et Vapeur.</p>
+                        <p>Depuis le début, ma mission est simple : offrir un nettoyage de textiles efficace, respectueux de vos biens et de l'environnement, tout en semant un peu de sourires, de confort et de légèreté dans votre quotidien. Je suis convaincu qu'un intérieur propre et sain contribue réellement à votre bien-être !</p>
+                        <blockquote class="mt-2 pl-5 border-l-[3px] border-brand-beige italic font-semibold text-brand-beige">Pourquoi choisir le nettoyage écologique ? Parce qu'aujourd'hui, on sait : la surconsommation a des conséquences. Racheter plutôt qu'entretenir ? Non merci ! Je m'engage donc à prolonger la durée de vie de vos meubles textiles, tout en préservant votre santé et celle de votre famille.</blockquote>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                        <span class="font-extrabold">Guillaume CHARPEIL</span>
+                        <span class="text-xs opacity-60">• Fondateur</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AVIS -->
+        <section id="avis" class="py-20 sm:py-28 bg-brand-cream">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="reveal text-center max-w-2xl mx-auto">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-brand-plumLight">Témoignages</p>
+                    <h2 class="mt-3 text-3xl sm:text-5xl font-black leading-[1.1] tracking-tight">Ils me font confiance !</h2>
+                </div>
+
+                <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                    <figure class="reveal lift relative flex flex-col justify-between gap-6 p-7 sm:p-10 m-0 rounded-[28px] sm:rounded-[32px] bg-white border border-brand-plum/5 shadow-soft hover:shadow-lift overflow-hidden" style="--d:0s">
+                        <span class="absolute -top-2 right-6 text-[7rem] leading-none font-black text-brand-plumLight/10 pointer-events-none select-none" aria-hidden="true">“</span>
+                        <div class="stars flex gap-1 text-brand-plumLight" aria-label="5 étoiles sur 5">
+                            <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+                        </div>
+                        <blockquote class="m-0 text-sm sm:text-base leading-relaxed font-medium italic text-brand-plum/85">"J'ai fait appel à Velours et Vapeur pour le nettoyage de mon canapé, de mon tapis et de mes chaises de salle à manger. Les tissus ont retrouvé leur couleur d'origine et le résultat est impressionnant. L'intervention a été rapide, efficace et très professionnelle. Guillaume a pris le temps de m'expliquer les avantages du nettoyage textile par injection-extraction et de la désinfection à la vapeur écologique. Je recommande Velours &amp; Vapeur !"</blockquote>
+                        <figcaption class="flex items-center gap-3 font-extrabold text-sm">
+                            <span class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-plum to-brand-plumLight text-brand-cream grid place-items-center text-xs font-black">SR</span>
+                            <span>Sophie R.<small class="block font-medium opacity-60 text-xs">Perpignan</small></span>
+                        </figcaption>
+                    </figure>
+
+                    <figure class="reveal lift relative flex flex-col justify-between gap-6 p-7 sm:p-10 m-0 rounded-[28px] sm:rounded-[32px] bg-white border border-brand-plum/5 shadow-soft hover:shadow-lift overflow-hidden" style="--d:.15s">
+                        <span class="absolute -top-2 right-6 text-[7rem] leading-none font-black text-brand-plumLight/10 pointer-events-none select-none" aria-hidden="true">“</span>
+                        <div class="stars flex gap-1 text-brand-plumLight" aria-label="5 étoiles sur 5">
+                            <i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i>
+                        </div>
+                        <blockquote class="m-0 text-sm sm:text-base leading-relaxed font-medium italic text-brand-plum/85">"Je prends soin de mon matelas... et malgré ça, je continuais de tousser tous les soirs en me couchant à cause des acariens. J'ai fait appel à Velours et Vapeur et là... enfin je ne tousse plus !! Quel soulagement. Un vrai nettoyage de matelas, avec les fibres nettoyées en profondeur et ça se ressent tout de suite. Merci beaucoup pour cette intervention rapide, efficace et avec le sourire."</blockquote>
+                        <figcaption class="flex items-center gap-3 font-extrabold text-sm">
+                            <span class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-plum to-brand-plumLight text-brand-cream grid place-items-center text-xs font-black">MA</span>
+                            <span>Marc A.<small class="block font-medium opacity-60 text-xs">Canet-en-Roussillon</small></span>
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-plumDark text-brand-cream/70 text-xs">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-14 sm:pt-16 pb-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+            <div class="space-y-3">
+                <span class="block text-2xl font-black text-brand-cream tracking-tight">Velours &amp; Vapeur</span>
+                <p class="text-[12px] leading-relaxed max-w-[30ch]">Nettoyage textile écologique haut de gamme dans les Pyrénées-Orientales.</p>
+            </div>
+            <div class="space-y-4">
+                <p class="font-extrabold text-brand-beige uppercase text-[10px] tracking-[0.16em]">Contact</p>
+                <ul class="space-y-2.5">
+                    <li class="text-brand-cream font-semibold">Guillaume CHARPEIL</li>
+                    <li><a href="mailto:veloursetvapeur@gmail.com" class="inline-flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all"><i data-lucide="mail" class="w-3.5 h-3.5"></i>veloursetvapeur@gmail.com</a></li>
+                    <li><a href="tel:0695795791" class="inline-flex items-center gap-2 font-extrabold text-brand-cream text-sm hover:translate-x-1 transition-all"><i data-lucide="phone" class="w-3.5 h-3.5"></i>06 95 79 57 91</a></li>
+                </ul>
+            </div>
+            <div class="space-y-4">
+                <p class="font-extrabold text-brand-beige uppercase text-[10px] tracking-[0.16em]">Réseaux</p>
+                <ul class="space-y-2.5">
+                    <li>
+                        <a href="https://instagram.com/veloursetvapeur" target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-white hover:translate-x-1 transition-all">
+                            <i data-lucide="instagram" class="w-3.5 h-3.5"></i>Instagram
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="space-y-4">
+                <p class="font-extrabold text-brand-beige uppercase text-[10px] tracking-[0.16em]">Légal</p>
+                <ul class="space-y-2.5">
+                    <li><a href="mentions-legales.html" class="hover:text-white hover:translate-x-1 inline-block transition-all">Mentions légales</a></li>
+                    <li><a href="politique-de-confidentialite.html" class="hover:text-white hover:translate-x-1 inline-block transition-all">Confidentialité</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="bg-black/25 border-t border-white/5 py-6 text-[10px]">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-center">
+                <p>© 2026 VELOURS ET VAPEUR</p>
+                <p>SIREN : 938 963 474 | SIRET : 938 963 474 00015</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CTA MOBILE FLOTTANT -->
+    <div id="mobile-cta" class="md:hidden fixed left-4 right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-40 translate-y-40 transition-transform duration-500 ease-soft">
+        <a href="demande-devis.html" class="flex items-center justify-center gap-2 bg-brand-plum text-brand-cream py-4 rounded-full font-bold text-xs uppercase tracking-wider shadow-2xl shadow-black/40">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            Prendre rendez-vous
+        </a>
+    </div>
+
+    <script>
+        document.documentElement.classList.add('js');
+        if (window.lucide) lucide.createIcons();
+
+        // Apparition au scroll
+        const revealEls = document.querySelectorAll('.reveal');
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+            revealEls.forEach((el) => io.observe(el));
+        } else {
+            revealEls.forEach((el) => el.classList.add('in'));
+        }
+
+        // En-tête et CTA mobile selon le défilement
+        const header = document.getElementById('site-header');
+        const mobileCta = document.getElementById('mobile-cta');
+        const onScroll = () => {
+            const y = window.scrollY;
+            header.classList.toggle('shadow-2xl', y > 24);
+            header.classList.toggle('shadow-black/40', y > 24);
+            mobileCta.classList.toggle('translate-y-40', y <= 600);
+            mobileCta.classList.toggle('translate-y-0', y > 600);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        // Menu mobile
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const setMenu = (open) => {
+            mobileMenu.classList.toggle('open', open);
+            menuBtn.setAttribute('aria-expanded', String(open));
+            menuBtn.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+        };
+        menuBtn.addEventListener('click', () => setMenu(!mobileMenu.classList.contains('open')));
+        mobileMenu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+        // Comparateurs avant / après
+        document.querySelectorAll('.ba').forEach((ba) => {
+            const range = ba.querySelector('.ba-range');
+            range.addEventListener('input', (e) => ba.style.setProperty('--pos', e.target.value + '%'));
+        });
+    </script>
+</body>
+</html>
