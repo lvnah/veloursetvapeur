@@ -24,7 +24,24 @@
         }
     </script>
     <style>
-        .doc-page { width: 210mm; min-height: 297mm; }
+        .doc-page { width: 210mm; max-width: 100%; min-height: 297mm; display: flex; flex-direction: column; }
+        .doc-page > .doc-footer { margin-top: auto; }
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { scrollbar-width: none; }
+
+        /* Fenêtre de confirmation */
+        .modal-enter { animation: modalIn .25s cubic-bezier(.22,.8,.24,1) both; }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea, select { font-size: 16px; padding: .75rem; }
+            .doc-page { width: 100%; min-height: 0; border-radius: 0; }
+            .doc-page .doc-body { padding-left: 1.25rem; padding-right: 1.25rem; }
+            .doc-page .doc-head { padding-left: 1.25rem; padding-right: 1.25rem; }
+            .editor-bottom-pad { padding-bottom: 6rem; }
+        }
         input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea, select {
             width: 100%;
             padding: .6rem .75rem;
@@ -40,11 +57,20 @@
         .tab-btn.active { background: #fcfaf8; color: #4a1531; }
         .card { background: #fff; border: 1px solid rgba(74, 21, 49, .06); border-radius: 1rem; box-shadow: 0 20px 50px -28px rgba(74, 21, 49, .28); }
         @media print {
-            body { background: #fff !important; }
+            @page { size: A4; margin: 8mm; }
+            html, body { background: #fff !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
             .no-print { display: none !important; }
-            .print-area { padding: 0 !important; margin: 0 !important; }
-            .doc-page { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; border: 0 !important; }
-            @page { size: A4; margin: 10mm; }
+            .print-area, .print-area > div, .print-area .overflow-auto { padding: 0 !important; margin: 0 !important; overflow: visible !important; }
+            /* Une seule page A4 : hauteur fixe, pas de débordement vers une page vierge */
+            .doc-page {
+                box-shadow: none !important; border: 0 !important;
+                width: 194mm !important; height: 281mm !important; min-height: 0 !important; max-height: 281mm !important;
+                overflow: hidden !important; margin: 0 auto !important;
+                font-size: 10.5px !important; page-break-inside: avoid !important; break-inside: avoid !important;
+            }
+            .doc-page table { page-break-inside: avoid; }
+            .doc-page .doc-footer { margin-top: auto !important; }
+            .table-wrap { overflow: visible !important; }
             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
@@ -80,7 +106,7 @@
                     <img src="../images/logo.png" alt="Velours & Vapeur" class="h-8 w-auto">
                     <span class="hidden md:inline text-xs font-bold uppercase tracking-widest opacity-70">Administration</span>
                 </div>
-                <nav class="flex items-center gap-1 overflow-x-auto">
+                <nav class="flex items-center gap-1 overflow-x-auto no-scrollbar min-w-0 -mx-1 px-1">
                     <button class="tab-btn" data-tab="dashboard">Tableau de bord</button>
                     <button class="tab-btn" data-tab="clients">Clients</button>
                     <button class="tab-btn" data-tab="documents">Devis &amp; factures</button>
@@ -118,8 +144,8 @@
                         <tr>
                             <th class="text-left p-3 font-bold">Client</th>
                             <th class="text-left p-3 font-bold hidden md:table-cell">Type</th>
-                            <th class="text-right p-3 font-bold">Devis</th>
-                            <th class="text-right p-3 font-bold">Factures</th>
+                            <th class="text-right p-3 font-bold hidden sm:table-cell">Devis</th>
+                            <th class="text-right p-3 font-bold hidden sm:table-cell">Factures</th>
                             <th class="text-right p-3 font-bold">Facturé</th>
                             <th class="text-right p-3 font-bold">Encaissé</th>
                             <th class="text-right p-3 font-bold">Reste dû</th>
@@ -167,7 +193,7 @@
         </section>
 
         <!-- ÉDITEUR -->
-        <div id="tab-editor" class="hidden max-w-[1400px] mx-auto p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-[460px_1fr] gap-6">
+        <div id="tab-editor" class="hidden max-w-[1400px] mx-auto p-4 sm:p-6 editor-bottom-pad grid grid-cols-1 xl:grid-cols-[460px_1fr] gap-6">
             <aside class="no-print space-y-5">
                 <section class="card p-5 space-y-4">
                     <div class="flex items-center justify-between">
@@ -230,7 +256,7 @@
                     <textarea id="e-notes" rows="3" placeholder="Informations affichées sur le document"></textarea>
                 </section>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2 fixed bottom-0 inset-x-0 z-30 bg-brand-cream/95 backdrop-blur p-3 border-t border-brand-plum/10 xl:static xl:bg-transparent xl:p-0 xl:border-0">
                     <button id="btn-save" class="col-span-2 bg-brand-plum text-brand-cream py-3.5 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight">Enregistrer</button>
                     <button id="btn-convert" class="hidden bg-white border border-brand-plum/20 py-3 rounded-full font-bold text-xs hover:bg-brand-beige">Créer la facture</button>
                     <button id="btn-print" class="bg-white border border-brand-plum/20 py-3 rounded-full font-bold text-xs hover:bg-brand-beige">Imprimer / PDF</button>
@@ -260,6 +286,23 @@
                 <button type="submit" class="bg-brand-plum text-brand-cream px-6 py-3 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-brand-plumLight">Enregistrer</button>
             </form>
         </section>
+    </div>
+
+    <!-- FENÊTRE DE CONFIRMATION -->
+    <div id="modal" class="no-print hidden fixed inset-0 z-[60] bg-brand-plumDark/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-enter bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-soft space-y-4">
+            <div class="flex items-start gap-3">
+                <span id="modal-icon" class="shrink-0 w-10 h-10 rounded-full bg-brand-beige text-brand-plum grid place-items-center font-black">!</span>
+                <div class="min-w-0">
+                    <h3 id="modal-title" class="font-black text-base"></h3>
+                    <p id="modal-text" class="text-sm opacity-75 mt-1"></p>
+                </div>
+            </div>
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                <button id="modal-cancel" type="button" class="w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold border border-brand-plum/20 hover:bg-brand-beige">Annuler</button>
+                <button id="modal-ok" type="button" class="w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold bg-brand-plum text-brand-cream hover:bg-brand-plumLight">Confirmer</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -300,6 +343,38 @@
             clearTimeout(toast._t);
             toast._t = setTimeout(() => t.classList.add('hidden'), 3000);
         }
+        // Fenêtre de confirmation personnalisée (remplace confirm() du navigateur)
+        function confirmModal({ title, text, okLabel = 'Confirmer', danger = false }) {
+            return new Promise((resolve) => {
+                $('modal-title').textContent = title;
+                $('modal-text').textContent = text;
+                const ok = $('modal-ok');
+                ok.textContent = okLabel;
+                ok.className = 'w-full sm:w-auto px-5 py-3 rounded-full text-xs font-bold text-brand-cream ' +
+                    (danger ? 'bg-red-800 hover:bg-red-900' : 'bg-brand-plum hover:bg-brand-plumLight');
+                $('modal-icon').textContent = danger ? '!' : '?';
+                $('modal').classList.remove('hidden');
+                ok.focus();
+
+                const close = (result) => {
+                    $('modal').classList.add('hidden');
+                    ok.onclick = null;
+                    $('modal-cancel').onclick = null;
+                    document.removeEventListener('keydown', onKey);
+                    $('modal').onclick = null;
+                    resolve(result);
+                };
+                const onKey = (e) => {
+                    if (e.key === 'Escape') close(false);
+                    if (e.key === 'Enter' && document.activeElement === ok) close(true);
+                };
+                ok.onclick = () => close(true);
+                $('modal-cancel').onclick = () => close(false);
+                $('modal').onclick = (e) => { if (e.target === $('modal')) close(false); };
+                document.addEventListener('keydown', onKey);
+            });
+        }
+
         const STATUS = {
             brouillon: 'Brouillon', envoye: 'Envoyé', accepte: 'Accepté', paye: 'Payé', annule: 'Annulé'
         };
@@ -406,11 +481,11 @@
                     <tr class="border-t border-brand-plum/10 hover:bg-brand-beige/40 cursor-pointer" data-client="${c.id}">
                         <td class="p-3 font-bold">${esc(c.name)}</td>
                         <td class="p-3 hidden md:table-cell opacity-70">${esc(c.type)}</td>
-                        <td class="p-3 text-right">${quotes.length}</td>
-                        <td class="p-3 text-right">${invoices.length}</td>
-                        <td class="p-3 text-right">${eur(billed)}</td>
-                        <td class="p-3 text-right text-emerald-800 font-bold">${eur(paid)}</td>
-                        <td class="p-3 text-right ${billed - paid > 0 ? 'text-amber-800 font-bold' : ''}">${eur(billed - paid)}</td>
+                        <td class="p-3 text-right hidden sm:table-cell">${quotes.length}</td>
+                        <td class="p-3 text-right hidden sm:table-cell">${invoices.length}</td>
+                        <td class="p-3 text-right whitespace-nowrap">${eur(billed)}</td>
+                        <td class="p-3 text-right text-emerald-800 font-bold whitespace-nowrap">${eur(paid)}</td>
+                        <td class="p-3 text-right whitespace-nowrap ${billed - paid > 0 ? 'text-amber-800 font-bold' : ''}">${eur(billed - paid)}</td>
                     </tr>`;
             }).join('');
             $('clients-body').innerHTML = rows || `<tr><td colspan="7" class="p-6 text-center opacity-60">Aucun client enregistré.</td></tr>`;
@@ -479,7 +554,13 @@
             const del = e.target.closest('[data-delete]');
             if (del) {
                 const doc = documents.find((d) => d.id === del.dataset.delete);
-                if (!confirm(`Supprimer ${doc.number} ? Cette action est définitive.`)) return;
+                const ok = await confirmModal({
+                    title: `Supprimer ${doc.number} ?`,
+                    text: 'Cette action est définitive. Les lignes du document seront supprimées aussi.',
+                    okLabel: 'Supprimer',
+                    danger: true
+                });
+                if (!ok) return;
                 const { error } = await sb.from('documents').delete().eq('id', doc.id);
                 if (error) return toast('Erreur : ' + error.message, true);
                 toast('Document supprimé');
@@ -526,7 +607,7 @@
             row.className = 'rounded-xl border border-brand-plum/10 p-3 space-y-2 bg-brand-cream/50';
             row.innerHTML = `
                 <textarea class="l-desc" rows="2" placeholder="Description (ex: Nettoyage canapé 3 places)">${esc(line.description || '')}</textarea>
-                <div class="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
+                <div class="grid grid-cols-[1fr_1fr_1.2fr_auto] gap-2 items-end">
                     <div><span class="label">Qté</span><input type="number" class="l-qty" min="0" step="1" value="${line.quantity ?? 1}"></div>
                     <div><span class="label">Unité</span><input type="text" class="l-unit" value="${esc(line.unit ?? 'unité')}"></div>
                     <div><span class="label">Prix unit. HT (€)</span><input type="number" class="l-price" min="0" step="0.01" value="${line.unit_price ?? 0}"></div>
@@ -729,7 +810,12 @@
         // Créer une facture à partir d'un devis enregistré
         $('btn-convert').addEventListener('click', async () => {
             if (!current || current.kind !== 'devis') return;
-            if (!confirm(`Créer une facture à partir de ${current.number} ?`)) return;
+            const ok = await confirmModal({
+                title: 'Créer la facture ?',
+                text: `Une nouvelle facture sera créée à partir de ${current.number}, avec les mêmes prestations.`,
+                okLabel: 'Créer la facture'
+            });
+            if (!ok) return;
             const { data: num, error: numErr } = await sb.rpc('next_number', { kind_in: 'facture' });
             if (numErr) return toast('Erreur : ' + numErr.message, true);
             const lines = current.document_lines.map((l) => ({
@@ -798,7 +884,7 @@
                 </tr>`).join('');
 
             $('doc').innerHTML = `
-                <div class="bg-brand-plum text-brand-cream px-10 py-7 flex items-center justify-between">
+                <div class="doc-head bg-brand-plum text-brand-cream px-10 py-7 flex items-center justify-between">
                     <img src="../images/logo.png" alt="Velours & Vapeur" class="h-14 w-auto">
                     <div class="text-right">
                         <p class="text-[10px] uppercase tracking-[0.25em] opacity-70">${title}</p>
@@ -806,7 +892,7 @@
                     </div>
                 </div>
 
-                <div class="px-10 pt-8 pb-10 space-y-8">
+                <div class="doc-body flex-1 px-10 pt-8 pb-10 space-y-8">
                     <div class="grid grid-cols-2 gap-8">
                         <div class="space-y-1">
                             <p class="text-[10px] uppercase tracking-[0.18em] font-bold opacity-60 mb-2">Émetteur</p>
@@ -835,7 +921,7 @@
 
                     ${d.object ? `<p class="text-base font-black">${esc(d.object)}</p>` : ''}
 
-                    <table class="w-full text-[11px]">
+                    <div class="table-wrap"><table class="w-full text-[11px]">
                         <thead>
                             <tr class="bg-brand-plum text-brand-cream">
                                 <th class="py-2 px-2 w-10 text-center font-bold">#</th>
@@ -847,7 +933,7 @@
                             </tr>
                         </thead>
                         <tbody>${rows || `<tr><td colspan="6" class="py-6 text-center opacity-50">Aucune prestation</td></tr>`}</tbody>
-                    </table>
+                    </table></div>
 
                     <div class="grid grid-cols-2 gap-8 items-start">
                         <div class="space-y-3 text-[11px]">
@@ -883,7 +969,7 @@
                     </div>` : ''}
                 </div>
 
-                <div class="bg-brand-plumDark text-brand-cream/70 text-[9px] text-center py-3">
+                <div class="doc-footer bg-brand-plumDark text-brand-cream/70 text-[9px] text-center py-3">
                     ${esc(i.name)}${i.brand ? ' · ' + esc(i.brand) : ''}${i.siret ? ' · SIRET ' + esc(i.siret) : ''}
                 </div>`;
         }
