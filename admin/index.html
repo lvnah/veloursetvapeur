@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#4a1531">
     <title>Administration | Velours & Vapeur</title>
@@ -27,19 +27,21 @@
         }
     </script>
     <style>
-        html { -webkit-tap-highlight-color: transparent; }
-        body { -webkit-font-smoothing: antialiased; }
+        html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body { -webkit-font-smoothing: antialiased; touch-action: manipulation; }
         .label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(74, 21, 49, .7); margin-bottom: .35rem; }
         input[type="date"], input[type="number"], input[type="text"], input[type="email"], input[type="tel"], input[type="password"], textarea, select {
             width: 100%;
             padding: .65rem .8rem;
-            background: #fcfaf8;
-            border: 1px solid rgba(74, 21, 49, .14);
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 49, .28);
             border-radius: .75rem;
-            font-size: .9rem;
-            color: #4a1531;
-            min-height: 44px;
+            font-size: 16px; /* 16px minimum : évite le zoom automatique sur iPhone */
+            color: #2d0c1d;
+            min-height: 46px;
         }
+        textarea { min-height: 88px; line-height: 1.5; }
+        input::placeholder, textarea::placeholder { color: rgba(74, 21, 49, .45); }
         input:focus, textarea:focus, select:focus { outline: none; border-color: #4a1531; box-shadow: 0 0 0 1px #4a1531; }
         .card { background: #fff; border: 1px solid rgba(74, 21, 49, .08); border-radius: 1.1rem; box-shadow: 0 16px 40px -28px rgba(74, 21, 49, .35); }
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 44px; padding: .7rem 1.1rem; border-radius: 999px; font-size: .8rem; font-weight: 700; transition: background-color .2s, transform .15s; }
@@ -265,6 +267,7 @@
                         <!-- Actions : barre fixe au-dessus de la navigation sur mobile -->
                         <div id="editor-actions" class="flex gap-2 items-center editor-actions-mobile xl:static xl:bg-transparent xl:border-0 xl:p-0">
                             <button id="btn-save" class="btn btn-primary flex-1 uppercase tracking-wider">Enregistrer</button>
+                            <button id="btn-preview" class="btn btn-ghost xl:hidden">Aperçu</button>
                             <button id="btn-pdf" class="btn btn-ghost">PDF</button>
                             <button id="btn-convert" class="hidden btn btn-ghost">Facture</button>
                         </div>
@@ -826,6 +829,12 @@
         wide.addEventListener('change', syncPreview);
 
         $('btn-save').addEventListener('click', saveDocument);
+
+        // Ouvre l'aperçu et le fait défiler à l'écran (mobile)
+        $('btn-preview').addEventListener('click', () => {
+            $('preview-wrap').open = true;
+            $('preview-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
 
         async function saveDocument() {
             const f = readForm();
