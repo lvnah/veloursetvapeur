@@ -494,40 +494,40 @@
                     <h3 class="text-xl sm:text-2xl font-black tracking-tight">Laissez votre avis</h3>
                     <p class="mt-1 text-sm text-brand-plum/70 font-medium">Vous avez fait appel à nous ? Partagez votre expérience. Votre avis sera publié après validation.</p>
 
-                    <form id="review-form" class="mt-6 grid gap-5" autocomplete="on">
+                    <form id="review-form" class="mt-8 grid gap-8" autocomplete="on">
                         <fieldset>
-                            <legend class="text-xs font-extrabold uppercase tracking-[0.12em] text-brand-plum/70 mb-2">Votre note</legend>
-                            <div id="star-picker" class="flex gap-1.5">
-                                <button type="button" data-v="1" aria-label="1 étoile" class="star-btn p-1 rounded-full text-brand-plum/25 hover:scale-110 transition-transform"></button>
-                                <button type="button" data-v="2" aria-label="2 étoiles" class="star-btn p-1 rounded-full text-brand-plum/25 hover:scale-110 transition-transform"></button>
-                                <button type="button" data-v="3" aria-label="3 étoiles" class="star-btn p-1 rounded-full text-brand-plum/25 hover:scale-110 transition-transform"></button>
-                                <button type="button" data-v="4" aria-label="4 étoiles" class="star-btn p-1 rounded-full text-brand-plum/25 hover:scale-110 transition-transform"></button>
-                                <button type="button" data-v="5" aria-label="5 étoiles" class="star-btn p-1 rounded-full text-brand-plum/25 hover:scale-110 transition-transform"></button>
+                            <legend class="text-sm font-bold text-brand-plum mb-3">Quelle note donneriez-vous ?</legend>
+                            <div id="star-picker" class="flex gap-2">
+                                <button type="button" data-v="1" aria-label="1 étoile" class="star-btn p-1.5 rounded-full text-brand-plum/25 hover:scale-110 active:scale-95 transition-transform"></button>
+                                <button type="button" data-v="2" aria-label="2 étoiles" class="star-btn p-1.5 rounded-full text-brand-plum/25 hover:scale-110 active:scale-95 transition-transform"></button>
+                                <button type="button" data-v="3" aria-label="3 étoiles" class="star-btn p-1.5 rounded-full text-brand-plum/25 hover:scale-110 active:scale-95 transition-transform"></button>
+                                <button type="button" data-v="4" aria-label="4 étoiles" class="star-btn p-1.5 rounded-full text-brand-plum/25 hover:scale-110 active:scale-95 transition-transform"></button>
+                                <button type="button" data-v="5" aria-label="5 étoiles" class="star-btn p-1.5 rounded-full text-brand-plum/25 hover:scale-110 active:scale-95 transition-transform"></button>
                             </div>
                             <input type="hidden" name="rating" id="rating-input" value="">
                         </fieldset>
 
-                        <div class="grid sm:grid-cols-2 gap-5">
-                            <label class="grid gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-brand-plum/70">
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <label class="grid gap-2.5 text-sm font-bold text-brand-plum">
                                 Prénom et nom
-                                <input type="text" name="name" required minlength="2" maxlength="80" autocomplete="name" class="rounded-xl border border-brand-plum/15 bg-brand-cream px-4 py-3 text-base normal-case tracking-normal font-medium text-brand-plum focus:outline-none focus:border-brand-plum">
+                                <input type="text" name="name" required minlength="2" maxlength="80" autocomplete="name" placeholder="Ex. Marie Lambert" class="h-14 rounded-2xl border border-brand-plum/15 bg-brand-cream/60 px-5 py-3.5 text-base font-medium text-brand-plum placeholder:text-brand-plum/35 transition focus:outline-none focus:bg-white focus:border-brand-plum focus:ring-4 focus:ring-brand-plum/10">
                             </label>
-                            <label class="grid gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-brand-plum/70">
+                            <label class="grid gap-2.5 text-sm font-bold text-brand-plum">
                                 Ville
-                                <input type="text" name="ville" required minlength="2" maxlength="80" autocomplete="address-level2" class="rounded-xl border border-brand-plum/15 bg-brand-cream px-4 py-3 text-base normal-case tracking-normal font-medium text-brand-plum focus:outline-none focus:border-brand-plum">
+                                <input type="text" name="ville" required minlength="2" maxlength="80" autocomplete="address-level2" placeholder="Ex. Canet-en-Roussillon" class="h-14 rounded-2xl border border-brand-plum/15 bg-brand-cream/60 px-5 py-3.5 text-base font-medium text-brand-plum placeholder:text-brand-plum/35 transition focus:outline-none focus:bg-white focus:border-brand-plum focus:ring-4 focus:ring-brand-plum/10">
                             </label>
                         </div>
 
-                        <label class="grid gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-brand-plum/70">
+                        <label class="grid gap-2.5 text-sm font-bold text-brand-plum">
                             Votre avis
-                            <textarea name="message" required minlength="10" maxlength="600" rows="4" class="rounded-xl border border-brand-plum/15 bg-brand-cream px-4 py-3 text-base normal-case tracking-normal font-medium text-brand-plum focus:outline-none focus:border-brand-plum resize-y"></textarea>
+                            <textarea name="message" required minlength="10" maxlength="600" rows="5" placeholder="Racontez-nous votre expérience en quelques mots…" class="rounded-2xl border border-brand-plum/15 bg-brand-cream/60 px-5 py-4 text-base font-medium leading-relaxed text-brand-plum placeholder:text-brand-plum/35 transition focus:outline-none focus:bg-white focus:border-brand-plum focus:ring-4 focus:ring-brand-plum/10 resize-y"></textarea>
                         </label>
 
                         <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
 
-                        <p id="review-msg" class="hidden text-sm font-bold" role="status"></p>
+                        <p id="review-msg" class="hidden rounded-2xl px-5 py-4 text-sm font-semibold" role="status"></p>
 
-                        <button type="submit" id="review-submit" class="justify-self-start inline-flex items-center gap-2 bg-brand-plum text-brand-cream px-8 py-4 rounded-full font-bold text-xs uppercase tracking-wider shadow-lg shadow-brand-plum/30 hover:bg-brand-plumLight hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:pointer-events-none">
+                        <button type="submit" id="review-submit" class="w-full sm:w-auto sm:justify-self-start inline-flex items-center justify-center gap-2 bg-brand-plum text-brand-cream px-10 py-4 rounded-full font-bold text-xs uppercase tracking-wider shadow-lg shadow-brand-plum/30 hover:bg-brand-plumLight hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:pointer-events-none">
                             Publier mon avis
                         </button>
                     </form>
